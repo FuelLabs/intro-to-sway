@@ -130,16 +130,16 @@ impl SwayStore for Contract {
         let owner = storage.owner;
         // make sure the owner has been initialized
         require(owner.is_none() == false, InvalidError::OnlyOwner);
-
         let sender: Result<Identity, AuthError> = msg_sender(); 
         // require the sender to be the owner
         require(sender.unwrap() == owner.unwrap(), InvalidError::OnlyOwner);
 
         // get the current balance of this contract for the base asset
         let amount = this_balance(BASE_ASSET_ID);
+        
+        // require the contract balance to be more than 0
+        require(amount > 0, InvalidError::NotEnoughTokens);
         // send the amount to the owner
-        if amount > 0 {
-            transfer(amount, BASE_ASSET_ID, owner.unwrap());
-        }
+         transfer(amount, BASE_ASSET_ID, owner.unwrap());
     }
 }
