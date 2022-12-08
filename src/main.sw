@@ -6,7 +6,6 @@ use std::{
         msg_sender,
     },
     call_frames::{
-        contract_id,
         msg_asset_id,
     },
     constants::BASE_ASSET_ID,
