@@ -113,8 +113,8 @@ impl SwayStore for Contract {
         // only charge commission if price is more than 10
         if amount > 1_000 {
             // for every 100 coins, the contract keeps 5
-            let comission = amount * 10 / 200;
-            let new_amount = amount - comission;
+            let commission = amount * 10 / 200;
+            let new_amount = amount - commission;
             // send the payout minus commission to the seller
             transfer(new_amount, asset_id, item.owner);
         } else {
