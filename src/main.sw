@@ -21,17 +21,24 @@ use std::{
 
 abi SwayStore {
     #[storage(read, write)]
+    // a function to list an item for sale
+    // takes the price and metadata as args
     fn list_item(price: u64, metadata: str[20]);
 
+    // a function to buy an item
+    // takes the item id as the arg
     #[storage(read, write)]
     fn buy_item(item_id: u64);
 
+    // a function to get a certain item
     #[storage(read)]
     fn get_item(item_id: u64) -> Item;
 
+    // a function to set the contract owner
     #[storage(read, write)]
     fn initialize_owner() -> Identity;
 
+    // a function to withdraw contract funds
     #[storage(read)]
     fn withdraw_funds();
 }
@@ -59,7 +66,7 @@ enum InvalidError {
     IncorrectAssetId: (),
     NotEnoughTokens: (),
     OnlyOwner: (),
-    IncorrectItemID: ()
+    IncorrectItemID: (),
 }
 
 impl SwayStore for Contract {
