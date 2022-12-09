@@ -7,7 +7,7 @@ async fn get_contract_instance() -> (MyContract, ContractId, Vec<WalletUnlocked>
     // Launch a local network and deploy the contract
     let wallets = launch_custom_provider_and_get_wallets(
         WalletsConfig::new(
-            Some(3),             /* Two wallets */
+            Some(3),             /* Three wallets */
             Some(1),             /* Single coin (UTXO) */
             Some(1_000_000_000), /* Amount per coin */
         ),
@@ -55,36 +55,36 @@ async fn can_set_owner() {
     assert!(Identity::Address(wallet_1.address().into()) == owner_result.value);
 }
 
-// #[tokio::test]
-// #[should_panic]
-// async fn can_set_owner_only_once() {
-//     let (instance, _id, wallets) = get_contract_instance().await;
+#[tokio::test]
+#[should_panic]
+async fn can_set_owner_only_once() {
+    let (instance, _id, wallets) = get_contract_instance().await;
 
-//     // get access to some test wallets
-//     let wallet_1 = wallets.get(0).unwrap();
-//     let wallet_2 = wallets.get(1).unwrap();
+    // get access to some test wallets
+    let wallet_1 = wallets.get(0).unwrap();
+    let wallet_2 = wallets.get(1).unwrap();
 
-//     // initialize wallet_1 as the owner
-//     let _owner_result = instance
-//         .with_wallet(wallet_1.clone())
-//         .unwrap()
-//         .methods()
-//         .initialize_owner()
-//         .call()
-//         .await
-//         .unwrap();
+    // initialize wallet_1 as the owner
+    let _owner_result = instance
+        .with_wallet(wallet_1.clone())
+        .unwrap()
+        .methods()
+        .initialize_owner()
+        .call()
+        .await
+        .unwrap();
 
-//     // this should fail
-//     // try to set the owner from wallet_2
-//     let _fail_owner_result = instance
-//         .with_wallet(wallet_2.clone())
-//         .unwrap()
-//         .methods()
-//         .initialize_owner()
-//         .call()
-//         .await
-//         .unwrap();
-// }
+    // this should fail
+    // try to set the owner from wallet_2
+    let _fail_owner_result = instance
+        .with_wallet(wallet_2.clone())
+        .unwrap()
+        .methods()
+        .initialize_owner()
+        .call()
+        .await
+        .unwrap();
+}
 
 #[tokio::test]
 async fn can_list_and_buy_item() {
