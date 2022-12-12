@@ -64,8 +64,9 @@ struct Item {
 
 enum InvalidError {
     IncorrectAssetId: (),
-    NotEnoughTokens: (),
+    NotEnoughTokens: u64,
     OnlyOwner: (),
+    OwnerNotInitialized: (),
     IncorrectItemID: (),
 }
 
@@ -102,7 +103,7 @@ impl SwayStore for Contract {
         // require the item to be set
         require(item.id > 0, InvalidError::IncorrectItemID);
         // require that the amount is at least the price of the item
-        require(amount >= item.price, InvalidError::NotEnoughTokens);
+        require(amount >= item.price, InvalidError::NotEnoughTokens(amount));
 
         // update the total amount bought
         item.total_bought += 1;
@@ -137,7 +138,7 @@ impl SwayStore for Contract {
     fn initialize_owner() -> Identity {
         let owner = storage.owner;
         // make sure the owner has NOT been initialized
-        require(owner.is_none(), InvalidError::OnlyOwner);
+        require(owner.is_none(), InvalidError::OwnerNotInitialized);
         // get the identity of the sender
         let sender: Result<Identity, AuthError> = msg_sender(); 
         // set the owner to the sender's identity
@@ -150,7 +151,7 @@ impl SwayStore for Contract {
     fn withdraw_funds() {
         let owner = storage.owner;
         // make sure the owner has been initialized
-        require(owner.is_none() == false, InvalidError::OnlyOwner);
+        require(owner.is_some(), InvalidError::OnlyOwner);
         let sender: Result<Identity, AuthError> = msg_sender(); 
         // require the sender to be the owner
         require(sender.unwrap() == owner.unwrap(), InvalidError::OnlyOwner);
@@ -159,7 +160,7 @@ impl SwayStore for Contract {
         let amount = this_balance(BASE_ASSET_ID);
 
         // require the contract balance to be more than 0
-        require(amount > 0, InvalidError::NotEnoughTokens);
+        require(amount > 0, InvalidError::NotEnoughTokens(amount));
         // send the amount to the owner
         transfer(amount, BASE_ASSET_ID, owner.unwrap());
     }
