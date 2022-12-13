@@ -67,7 +67,8 @@ enum InvalidError {
     NotEnoughTokens: u64,
     OnlyOwner: (),
     OwnerNotInitialized: (),
-    IncorrectItemID: (),
+    OwnerAlreadyInitialized: (),
+    IncorrectItemID: ()
 }
 
 impl SwayStore for Contract {
@@ -137,8 +138,8 @@ impl SwayStore for Contract {
     #[storage(read, write)]
     fn initialize_owner() -> Identity {
         let owner = storage.owner;
-        // make sure the owner has NOT been initialized
-        require(owner.is_none(), InvalidError::OwnerNotInitialized);
+        // make sure the owner has NOT already been initialized
+        require(owner.is_none(), InvalidError::OwnerAlreadyInitialized);
         // get the identity of the sender
         let sender: Result<Identity, AuthError> = msg_sender(); 
         // set the owner to the sender's identity
@@ -151,7 +152,7 @@ impl SwayStore for Contract {
     fn withdraw_funds() {
         let owner = storage.owner;
         // make sure the owner has been initialized
-        require(owner.is_some(), InvalidError::OnlyOwner);
+        require(owner.is_some(), InvalidError::OwnerNotInitialized);
         let sender: Result<Identity, AuthError> = msg_sender(); 
         // require the sender to be the owner
         require(sender.unwrap() == owner.unwrap(), InvalidError::OnlyOwner);
