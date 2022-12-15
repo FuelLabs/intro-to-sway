@@ -256,7 +256,7 @@ Here we are setting the variable `owner` as a variable that could be `None` or c
 owner: Option<Identity> = Option::None
 ```
 
-If you want a value to be null or undefined under certain conditions, you can use an `Option` type to specify the type when a value exists. The keyword `None` represents that no value, while the keyword `Some` means there is some value stored.
+If you want a value to be null or undefined under certain conditions, you can use an `Option` type, which is an enum that can be either Some(value) or None. The keyword `None` represents that no value exists, while the keyword `Some` means there is some value stored.
 
 
 ### Item Struct
