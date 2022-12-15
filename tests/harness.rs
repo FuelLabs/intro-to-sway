@@ -141,6 +141,7 @@ async fn can_list_and_buy_item() {
 
     assert!(item_1.value.price == item_1_price);
     assert!(item_1.value.id == 1);
+    assert!(item_1.value.total_bought == 1);
 }
 
 #[tokio::test]
