@@ -294,7 +294,7 @@ enum InvalidError {
 
 In our contract, we can expect there to be some different situations where we want to throw an error and prevent the transaction from executing: 
 1. Someone could try to pay for an item with the wrong currency.
-2. Someone could try to buy an item without having enough coins
+2. Someone could try to buy an item without having enough coins.
 3. Someone could try to withdraw funds from the contract who isn't the owner. 
 4. Someone could try to withdraw funds before the owner has been initialized.
 5. Someone could try to set the owner after the owner has already been initialized.
@@ -304,7 +304,7 @@ We can define the return type for a variation with the unit type `()`, or empty 
 
 ### Contract Functions
 
-Finally, we can write our contract functions. Copy and paste the ABI from earlier. The functions in the contract *must *match the ABI, or the compiler will throw an error. Replace the semicolons at the end of each function with curly brackets, and change `abi SwayStore` to `impl SwayStore for Contract` as shown below:
+Finally, we can write our contract functions. Copy and paste the ABI from earlier. The functions in the contract *must* match the ABI, or the compiler will throw an error. Replace the semicolons at the end of each function with curly brackets, and change `abi SwayStore` to `impl SwayStore for Contract` as shown below:
 
 ```rust
 impl SwayStore for Contract {
@@ -472,7 +472,7 @@ We can use the `msg_asset_id` function imported from the standard library to get
 let asset_id = msg_asset_id();
 ```
 
-We can use a `require` statement to assert that the asset sent is the right one.
+Then, we can use a `require` statement to assert that the asset sent is the right one.
 
 A `require` statement takes two arguments: a condition and a value that gets logged if the condition is false. If false, the entire transaction will be reverted, and no changes will be applied. 
 
@@ -501,13 +501,13 @@ let mut item = storage.item_map.get(item_id);
 
 By default, all variables are immutable in Sway for both `let` and `const`. However, if you want to change the value of any variable, you have to declare it as mutable with the `mut` keyword. Because we'll update the item's `total_bought` value later, we need to define it as mutable.
 
-We'll want to ensure that the `item_id `passed is valid. Because the `get` method will return an Item struct with values of zero, and the item ID of `0` is never used, we can check to see if the ID of the returned item is greater than zero.
+We'll want to ensure that the `item_id` passed is valid. Because the `get` method will return an Item struct with values of zero if the `item_id` is not valid, and the item ID of `0` is never used, we can check to see if the ID of the returned item is greater than zero to make sure the Item struct returned is valid.
 
 ```rust
 require(item.id > 0, InvalidError::IncorrectItemID);
 ```
 
-We also want to require the number of coins sent to buy the item isn't less than the price.
+We also want to require that the number of coins sent to buy the item isn't less than the item's price.
 
 ```rust
 require(amount >= item.price, InvalidError::NotEnoughTokens(amount));
@@ -530,9 +530,9 @@ storage.purchases.push((item_id, sender.unwrap()));
 
 #### Transferring payment
 
-Finally, we can transfer the payment to the seller. It's always best to transfer assets after all storage updates have been made to avoid re-entrancy attacks. (LINK)
+Finally, we can transfer the payment to the seller. It's always best to transfer assets after all storage updates have been made to avoid [re-entrancy attacks](https://fuellabs.github.io/sway/v0.32.1/book/blockchain-development/calling_contracts.html).
 
-We can subtract a fee for items that meet a certain price threshold using a conditional `if` statement. `if` statements in Sway don't use parentheses around the conditions but look the same as in JavaScript.
+We can subtract a fee for items that meet a certain price threshold using a conditional `if` statement. `if` statements in Sway don't use parentheses around the conditions, but otherwise look the same as in JavaScript.
 
 ```rust
 if amount > 1_000 {
@@ -548,13 +548,13 @@ In the if-condition above, we check if the amount sent exceeds 1,000. To visuall
 
 If the amount exceeds 1,000, we calculate a commission and subtract that from the amount.
 
-We can use the `transfer` function to send the amount to the item owner. The `transfer` is imported from the standard library and takes three arguments: the number of coins to transfer, the asset ID of the coins, and an Identity to send the coins. 
+We can use the `transfer` function to send the amount to the item owner. The `transfer` function is imported from the standard library and takes three arguments: the number of coins to transfer, the asset ID of the coins, and an Identity to send the coins to. 
 
 ### Get an item
 
 To get the details for an item, we can create a read-only function that returns the `Item` struct for a given item ID.
 
-```rust=132
+```rust
 #[storage(read)]
 fn get_item(item_id: u64) -> Item {
     // returns the item for the given item_id
@@ -593,7 +593,7 @@ fn initialize_owner() -> Identity {
 }
 ```
 
-Because we only want to be able to call this function once (right after the contract is deployed), we'll require that the owner value still needs to be set. To do that, we can use the `is_none` method to check if an Option type is `None`. 
+Because we only want to be able to call this function once (right after the contract is deployed), we'll require that the owner value still needs be `None`. To do that, we can use the `is_none` method, which checks if an Option type is `None`. 
 
 ```rust
 let owner = storage.owner;
@@ -637,7 +637,7 @@ fn withdraw_funds() {
 }
 ```
 
-First, we'll ensure that the owner has been set, so we don't send funds to a zero address.
+First, we'll ensure that the owner has been initalized to some address.
 
 ```rust
 let owner = storage.owner;
@@ -651,7 +651,7 @@ let sender: Result<Identity, AuthError> = msg_sender();
 require(sender.unwrap() == owner.unwrap(), InvalidError::OnlyOwner);
 ```
 
-We can also ensure that there are funds to send using the `this_balance` function from the standard library. 
+We can also ensure that there are funds to send using the `this_balance` function from the standard library, which returns the balance of this contract.
 
 ```rust
 let amount = this_balance(BASE_ASSET_ID);
@@ -670,6 +670,8 @@ transfer(amount, BASE_ASSET_ID, owner.unwrap());
 You can compile your contract by running `forc build` in the contract folder. And that's it! You just wrote an entire contract in Sway 💪🛠🔥🚀🎉😎🌴✨.
 
 You can see the complete code for this contract plus example tests using the Rust SDK in this repo.
+
+To run the tests in `harness.rs`, use `cargo test`. To print to the console from the tests, use `cargo test -- --nocapture`.
 
 ## Keep building on Fuel
 
