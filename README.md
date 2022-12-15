@@ -33,7 +33,7 @@ Part of what makes Sway so unique is the fantastic suite of tools surrounding it
 
 - 🔭 Fuel Indexer: Easily make your own indexer to organize and query on-chain data.
 
-You can use Sway to write contracts, scripts, predicates, and libraries on the Fuel network.
+You can use Sway to write contracts, scripts, predicates, and libraries for the Fuel network.
 
 - 💼 A contract is a set of functions with persistent state that can be deployed on a blockchain. Once deployed, the contract lives on the blockchain and can never be changed or deleted. Anyone can access the state or call public functions without permission. 
 
