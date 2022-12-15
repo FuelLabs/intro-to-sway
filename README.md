@@ -2,7 +2,7 @@
 
 If you know JavaScript, you can quickly learn to build full-stack dapps, or decentralized applications, on Fuel with Sway. Once you learn some Sway fundamentals, you'll be ready to start building your own dapp.
 
-## TDLR
+## TLDR
 
 A Sway contract for a decentralized Amazon-like marketplace.
 
