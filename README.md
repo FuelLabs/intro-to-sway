@@ -142,9 +142,9 @@ Our contract's ABI will look like this:
 
 ```rust
 abi SwayStore {
-    #[storage(read, write)]
     // a function to list an item for sale
     // takes the price and metadata as args
+    #[storage(read, write)]
     fn list_item(price: u64, metadata: str[20]);
 
     // a function to buy an item
