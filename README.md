@@ -450,7 +450,7 @@ fn buy_item(item_id: u64) {
 
     // add the purchase to the storage vector
     storage.purchases.push((item_id, sender.unwrap()));
-    // only charge commission if price is more than 10
+    // only charge commission if price is more than 1,000
     if amount > 1_000 {
         // for every 100 coins, the contract keeps 5
         let commission = amount / 20;
