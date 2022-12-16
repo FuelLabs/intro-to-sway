@@ -154,6 +154,26 @@ struct Item {
 
 The item struct will hold an ID, price, the owner's identity, a string for a URL or identifier where off-chain data about the item is stored (such as the description and photos), and a counter for the total number of purchases.
 
+#### Types
+
+The `Item` struct uses three types: `u64`, `str[20]`, and `Identity`.
+
+`u64`: a 64-bit unsigned integer
+
+In Sway, there are four native types of numbers:
+- `u8`: an 8-bit unsigned integer
+- `u16` a 16-bit unsigned integer
+- `u32` a 32-bit unsigned integer
+- `u64`: a 64-bit unsigned integer
+
+An unsigned integer means there is no `+` or `-` sign, so the value is always positive. `u64` is the default type used for numbers in Sway. To use other number types, for example [`u256`](https://github.com/FuelLabs/sway/blob/master/sway-lib-std/src/u256.sw) or [signed integers](https://github.com/FuelLabs/sway-libs/tree/master/sway_libs/src/signed_integers), you must import them from a library.
+
+In JavaScript, there are two types of integers: a number and a BigInt. The main difference between these types is that BigInt can store a much larger value. Similarly, each number type for Sway has different values for the largest number that can be stored.
+
+`str[20]`: a string with exactly 20 characters. All strings in Sway must have a fixed length. 
+
+`Identity`: an enum type that represents either a user's `Address` or a `ContractId`. We already imported this type from the standard library earlier.
+
 ### ABI
 
 Next, we will define our ABI. ABI stands for application binary interface. In a Sway contract, it's an outline of all of the functions in the contract. For each function, you must specify its name, input types, return types, and level of storage access. 
@@ -195,28 +215,6 @@ A function is defined with the `fn` keyword. Sway uses snake case, so instead of
 You must define the return type using a skinny arrow if the function returns anything. If there are any parameters, the types must also be defined for those. Semicolons are *required* at the end of each line.
 
 If any function reads from or writes to storage, you must define that level of access above the function with either `#[storage(read)]` or `#[storage(read, write)]`.
-
-#### Types
-
-Four types are used in the ABI: `u64`, `str[20]`, `Item`, and `Identity`.
-
-`u64`: a 64-bit unsigned integer
-
-In Sway, there are four native types of numbers:
-- `u8`: an 8-bit unsigned integer
-- `u16` a 16-bit unsigned integer
-- `u32` a 32-bit unsigned integer
-- `u64`: a 64-bit unsigned integer
-
-An unsigned integer means there is no `+` or `-` sign, so the value is always positive. `u64` is the default type used for numbers in Sway. To use other number types, for example [`u256`](https://github.com/FuelLabs/sway/blob/master/sway-lib-std/src/u256.sw) or [signed integers](https://github.com/FuelLabs/sway-libs/tree/master/sway_libs/src/signed_integers), you must import them from a library.
-
-In JavaScript, there are two types of integers: a number and a BigInt. The main difference between these types is that BigInt can store a much larger value. Similarly, each number type for Sway has different values for the largest number that can be stored.
-
-`str[20]`: a string with exactly 20 characters. All strings in Sway must have a fixed length. 
-
-`Item`: a struct that represents an item for sale. You will define this later.
-
-`Identity`: an enum type that represents either a user's `Address` or a `ContractId`. We already imported this type from the standard library earlier.
 
 ### Storage Block
 
