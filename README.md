@@ -206,8 +206,6 @@ abi SwayStore {
 }
 ``` 
 
-A lot is going on here, so let's break it down a little:
-
 #### Functions
 
 A function is defined with the `fn` keyword. Sway uses snake case, so instead of naming a function `myFunction`, you would use `my_function`.
