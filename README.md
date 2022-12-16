@@ -664,7 +664,6 @@ Finally, we will transfer the balance of the contract to the owner.
 transfer(amount, BASE_ASSET_ID, owner.unwrap());
 ```
 
-
 ## Testing the contract
 
 You can compile your contract by running `forc build` in the contract folder. And that's it! You just wrote an entire contract in Sway 💪🛠🔥🚀🎉😎🌴✨.
