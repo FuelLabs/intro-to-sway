@@ -134,6 +134,26 @@ use std::{
 ```
 We'll go through what each of these imports does as we use them later.
 
+### Item Struct
+
+Struct is short for structure, which is a data structure similar to an object in JavaScript. You define a struct with the `struct` keyword and define the fields of a struct inside curly brackets.
+
+The core of our program is the ability to list, sell, get, etc. `items`.
+
+You can define the `Item` type as shown below:
+
+```rust
+struct Item {
+    id: u64,
+    price: u64,
+    owner: Identity,
+    metadata: str[20],
+    total_bought: u64,
+}
+```
+
+The item struct will hold an ID, price, the owner's identity, a string for a URL or identifier where off-chain data about the item is stored (such as the description and photos), and a counter for the total number of purchases.
+
 ### ABI
 
 Next, we will define our ABI. ABI stands for application binary interface. In a Sway contract, it's an outline of all of the functions in the contract. For each function, you must specify its name, input types, return types, and level of storage access. 
@@ -257,25 +277,6 @@ owner: Option<Identity> = Option::None
 ```
 
 If you want a value to be null or undefined under certain conditions, you can use an `Option` type, which is an enum that can be either Some(value) or None. The keyword `None` represents that no value exists, while the keyword `Some` means there is some value stored.
-
-
-### Item Struct
-
-Struct is short for structure, which is a data structure similar to an object in JavaScript. You define a struct with the `struct` keyword and define the fields of a struct inside curly brackets.
-
-You can define the `Item` type as shown below:
-
-```rust
-struct Item {
-    id: u64,
-    price: u64,
-    owner: Identity,
-    metadata: str[20],
-    total_bought: u64,
-}
-```
-
-The item struct will hold an ID, price, the owner's identity, a string for a URL or identifier where off-chain data about the item is stored (such as the description and photos), and a counter for the total number of purchases.
 
 ### Error Handling
 
