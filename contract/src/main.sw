@@ -19,6 +19,14 @@ use std::{
     token::transfer,
 };
 
+struct Item {
+    id: u64,
+    price: u64,
+    owner: Identity,
+    metadata: str[20],
+    total_bought: u64,
+}
+
 abi SwayStore {
     // a function to list an item for sale
     // takes the price and metadata as args
@@ -41,6 +49,9 @@ abi SwayStore {
     // a function to withdraw contract funds
     #[storage(read)]
     fn withdraw_funds();
+
+    #[storage(read)]
+    fn get_count() -> u64;
 }
 
 storage {
@@ -52,14 +63,6 @@ storage {
     // stores the item ID and buyer identity for all purchases
     purchases: StorageVec<(u64, Identity)> = StorageVec {},
     owner: Option<Identity> = Option::None,
-}
-
-struct Item {
-    id: u64,
-    price: u64,
-    owner: Identity,
-    metadata: str[20],
-    total_bought: u64,
 }
 
 enum InvalidError {
@@ -164,5 +167,10 @@ impl SwayStore for Contract {
         require(amount > 0, InvalidError::NotEnoughTokens(amount));
         // send the amount to the owner
         transfer(amount, BASE_ASSET_ID, owner.unwrap());
+    }
+
+    #[storage(read)]
+    fn get_count() -> u64{
+        storage.item_counter
     }
 }
