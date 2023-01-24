@@ -41,15 +41,15 @@ function App() {
 
   return (
     <div className="App">
-       <nav>
-          <ul>
-              <li onClick={() => setActive('all-items')}>See All Items</li>
-              <li onClick={() => setActive('list-item')}>List an Item</li>
-          </ul>
-        </nav>
       <header>
         <h1>Sway Marketplace</h1>
       </header>
+       <nav>
+          <ul>
+              <li className={active === 'all-items' ? "active-tab" : ""} onClick={() => setActive('all-items')}>See All Items</li>
+              <li className={active === 'list-item' ? "active-tab" : ""} onClick={() => setActive('list-item')}>List an Item</li>
+          </ul>
+        </nav>
 
       {Fuel ? (
         <div>
