@@ -1,9 +1,9 @@
-use fuels::{prelude::*, tx::AssetId, tx::ContractId};
+use fuels::{prelude::*, tx::AssetId, tx::ContractId, types::{Identity, SizedAsciiString}};
 
 // Load abi from json
-abigen!(MyContract, "out/debug/sway_store_contract-abi.json");
+abigen!(Contract(name="SwayStore", abi="out/debug/sway_store_contract-abi.json"));
 
-async fn get_contract_instance() -> (MyContract, ContractId, Vec<WalletUnlocked>) {
+async fn get_contract_instance() -> (SwayStore, ContractId, Vec<WalletUnlocked>) {
     // Launch a local network and deploy the contract
     let wallets = launch_custom_provider_and_get_wallets(
         WalletsConfig::new(
@@ -29,7 +29,7 @@ async fn get_contract_instance() -> (MyContract, ContractId, Vec<WalletUnlocked>
     .await
     .unwrap();
 
-    let instance = MyContract::new(id.clone(), wallet);
+    let instance = SwayStore::new(id.clone(), wallet);
 
     (instance, id.into(), wallets)
 }
@@ -96,7 +96,7 @@ async fn can_list_and_buy_item() {
     let wallet_2 = wallets.get(1).unwrap();
 
     // item 1 params
-    let item_1_metadata: fuels::core::types::SizedAsciiString<20> = "metadata__url__here_"
+    let item_1_metadata: SizedAsciiString<20> = "metadata__url__here_"
         .try_into()
         .expect("Should have succeeded");
     let item_1_price: u64 = 15;
@@ -168,7 +168,7 @@ async fn can_withdraw_funds() {
     assert!(Identity::Address(wallet_1.address().into()) == owner_result.value);
 
     // item 1 params
-    let item_1_metadata: fuels::core::types::SizedAsciiString<20> = "metadata__url__here_"
+    let item_1_metadata: SizedAsciiString<20> = "metadata__url__here_"
         .try_into()
         .expect("Should have succeeded");
     let item_1_price: u64 = 15_000;
