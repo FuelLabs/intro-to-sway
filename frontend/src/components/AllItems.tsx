@@ -10,6 +10,8 @@ interface AllItemsProps {
 export default function AllItems({ contract }: AllItemsProps) {
   const [items, setItems] = useState<ItemOutput[]>([]);
   const [itemCount, setItemCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function getAllItems() {
@@ -26,8 +28,9 @@ export default function AllItems({ contract }: AllItemsProps) {
             tempItems.push(resp.value)
           }
           setItems(tempItems)
-
+          setLoading(false)
         } catch (e) {
+          setError("Something went wrong, try reloading the page.")
           console.log("ERROR:", e);
         }
       }
@@ -38,21 +41,24 @@ export default function AllItems({ contract }: AllItemsProps) {
   return (
     <div>
       <h2>All Items</h2>
-
-      <div>
-        {itemCount === 0 ? (
-          <div>Uh oh! No items have been listed yet</div>
-        ) : (
-          <div>
-            <div>Total items: {itemCount}</div>
-            <div className="items-container">
-                {items.map((item) => (
-                <ItemCard key={item.id.format()} contract={contract} item={item}/>
-            ))}
-            </div>
+      {error && <div>{error}</div>}
+      {loading && error === null && <div>Loading...</div>}
+      {!loading &&
+        <div>
+          {itemCount === 0 ? (
+            <div>Uh oh! No items have been listed yet</div>
+          ) : (
+            <div>
+              <div>Total items: {itemCount}</div>
+              <div className="items-container">
+                  {items.map((item) => (
+                  <ItemCard key={item.id.format()} contract={contract} item={item}/>
+              ))}
+              </div>
+          </div>
+          )}
         </div>
-        )}
-      </div>
+      }
     </div>
   );
 }
