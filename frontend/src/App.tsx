@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useIsConnected } from "./hooks/useIsConnected";
 import { useFuel } from "./hooks/useFuel";
 import { WalletLocked } from "fuels";
-import { FuelWalletProvider } from "@fuel-wallet/sdk";
 import { SwayStoreContractAbi__factory } from "./contracts"
 import AllItems from "./components/AllItems";
 import ListItem from "./components/ListItem";
@@ -11,25 +10,24 @@ import "./App.css";
 const CONTRACT_ID = "0xd715df667608312fe9f2e57f8e92d2dd0f5e23db94d8a27f63c3c5c74c01da77"
 
 function App() {
-  const [accounts, setAccounts] = useState<Array<string>>([]);
-  const [provider, setProvider] = useState<FuelWalletProvider>();
+  const [account, setAccount] = useState<string>();
+  const [wallet, setWallet] = useState<WalletLocked>();
   const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
   const isConnected = useIsConnected();
   const [Fuel] = useFuel();
 
   useEffect(() => {
     async function getAccounts() {
-      const accounts = await Fuel.accounts();
-      const prov = await Fuel.getProvider();
-      setAccounts(accounts);
-      setProvider(prov);
+      const currentAccount = await Fuel.currentAccount();
+      const tempWallet = await Fuel.getWallet(currentAccount)
+      setAccount(currentAccount);
+      setWallet(tempWallet)
     }
     if (Fuel) getAccounts();
   }, [Fuel]);
 
   const contract = useMemo(() => {
-    if (Fuel && accounts[0] && provider) {
-      const wallet = new WalletLocked(accounts[0], provider);
+    if (Fuel && account && wallet) {
       // Connects out Contract instance to the deployed contract
       // address using the given wallet.
       const contract = SwayStoreContractAbi__factory.connect(CONTRACT_ID, wallet);
@@ -37,7 +35,8 @@ function App() {
       return contract;
     }
     return null;
-  }, [Fuel, accounts, provider]);
+  }, [Fuel, account, wallet]);
+
 
   return (
     <div className="App">
