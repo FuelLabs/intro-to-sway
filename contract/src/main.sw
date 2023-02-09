@@ -1,17 +1,13 @@
 contract;
 
 use std::{
-    auth::{
-        AuthError,
-        msg_sender,
-    },
+    auth::msg_sender,
     call_frames::msg_asset_id,
     constants::BASE_ASSET_ID,
     context::{
         msg_amount,
         this_balance,
     },
-    identity::Identity,
     token::transfer,
 };
 
@@ -72,12 +68,12 @@ impl SwayStore for Contract {
         // increment the item counter
         storage.item_counter += 1;
         //  get the message sender
-        let sender: Result<Identity, AuthError> = msg_sender();
+        let sender = msg_sender().unwrap();
         // configure the item
         let new_item: Item = Item {
             id: storage.item_counter,
             price: price,
-            owner: sender.unwrap(),
+            owner: sender,
             metadata: metadata,
             total_bought: 0,
         };
@@ -131,11 +127,11 @@ impl SwayStore for Contract {
         // make sure the owner has NOT already been initialized
         require(owner.is_none(), "owner already initialized");
         // get the identity of the sender
-        let sender: Result<Identity, AuthError> = msg_sender(); 
+        let sender = msg_sender().unwrap(); 
         // set the owner to the sender's identity
-        storage.owner = Option::Some(sender.unwrap());
+        storage.owner = Option::Some(sender);
         // return the owner
-        sender.unwrap()
+        sender
     }
 
     #[storage(read)]
@@ -143,9 +139,9 @@ impl SwayStore for Contract {
         let owner = storage.owner;
         // make sure the owner has been initialized
         require(owner.is_some(), "owner not initialized");
-        let sender: Result<Identity, AuthError> = msg_sender(); 
+        let sender = msg_sender().unwrap(); 
         // require the sender to be the owner
-        require(sender.unwrap() == owner.unwrap(), InvalidError::OnlyOwner(sender.unwrap()));
+        require(sender == owner.unwrap(), InvalidError::OnlyOwner(sender));
 
         // get the current balance of this contract for the base asset
         let amount = this_balance(BASE_ASSET_ID);
@@ -157,7 +153,7 @@ impl SwayStore for Contract {
     }
 
     #[storage(read)]
-    fn get_count() -> u64{
+    fn get_count() -> u64 {
         storage.item_counter
     }
 }
