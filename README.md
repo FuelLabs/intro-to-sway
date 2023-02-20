@@ -663,11 +663,91 @@ transfer(amount, BASE_ASSET_ID, owner.unwrap());
 
 ## Testing the contract
 
-You can compile your contract by running `forc build` in the contract folder. And that's it! You just wrote an entire contract in Sway 💪🛠🔥🚀🎉😎🌴✨.
+You can compile your contract by running `forc build` in the contract folder. You can see the complete code for this contract plus example tests using the Rust SDK in this repo. To run the tests in `harness.rs`, use `cargo test`. To print to the console from the tests, use `cargo test -- --nocapture`.
 
-You can see the complete code for this contract plus example tests using the Rust SDK in this repo.
+## Deploying the Contract
 
-To run the tests in `harness.rs`, use `cargo test`. To print to the console from the tests, use `cargo test -- --nocapture`.
+It's now time to deploy the contract to the testnet. We will show how to do this using `forc` from the command line, but you can also do it using the [Rust SDK](https://github.com/FuelLabs/fuels-rs#deploying-a-sway-contract) or the [TypeScript SDK](https://github.com/FuelLabs/fuels-ts/#deploying-contracts).
+
+In order to deploy a contract, you need to have a wallet to sign the transaction and coins to pay for gas. First, we'll create a wallet.
+
+### Install the Wallet CLI
+
+Follow [these steps to set up a wallet and create an account](https://github.com/FuelLabs/forc-wallet#forc-wallet).
+
+After typing in a password, be sure to save the mnemonic phrase that is output.
+
+With this, you'll get a fuel address that looks something like this: `fuel1efz7lf36w9da9jekqzyuzqsfrqrlzwtt3j3clvemm6eru8fe9nvqj5kar8`. Save this address as you'll need it to sign transactions when we deploy the contract.
+
+#### Get Testnet Coins
+
+With your account address in hand, head to the [testnet faucet](https://faucet-beta-1.fuel.network/) to get some coins sent to your wallet.
+
+## Deploy To Testnet
+
+Now that you have a wallet, you can deploy with `forc deploy` and passing in the testnet endpoint like this:
+
+`forc deploy --random-salt ---node-url https://node-beta-2.fuel.network/graphql --gas-price 1`
+
+> **Note**
+> We set the gas price to 1. Without this flag, the gas price is 0 by default and the transaction will fail.
+
+The terminal will ask for the address of the wallet you want to sign this transaction with, paste in the address you saved earlier, it looks like this: `fuel1efz7lf36w9da9jekqzyuzqsfrqrlzwtt3j3clvemm6eru8fe9nvqj5kar8`
+
+The terminal will output your contract id. Be sure to save this as you will need it to build a frontend with the Typescript SDK.
+
+The terminal will output a `transaction id to sign` and prompt you for a signature. Open a new terminal tab and view your accounts by running `forc wallet list`. If you followed these steps, you'll notice you only have one account, `0`.
+
+Grab the `transaction id` from your other terminal and sign with a specified account by running the following command:
+
+```console
+forc wallet sign --id `[transaction id here, without brackets]` --account-index `[the account number, without brackets]`
+```
+
+Your command should look like this:
+
+```console
+$ forc wallet sign --id 16d7a8f9d15cfba1bd000d3f99cd4077dfa1fce2a6de83887afc3f739d6c84df --accounts-index 0
+Please enter your password to decrypt initialized wallet's phrases:
+Signature: 736dec3e92711da9f52bed7ad4e51e3ec1c9390f4b05caf10743229295ffd5c1c08a4ca477afa85909173af3feeda7c607af5109ef6eb72b6b40b3484db2332c
+```
+
+Enter your password when prompted, and you'll get back a `signature`. Save that signature, and return to your other terminal window, and paste that in where its prompting you to `provide a signature for this transaction`.
+
+Finally, you will get back a `TransactionId` to confirm your contract was deployed. With this ID, you can head to the [block explorer](https://fuellabs.github.io/block-explorer-v2/) and view your contract.
+
+> **Note**
+> You should prefix your `TransactionId` with `0x` to view it in the block explorer
+
+## Using a Salt to deploy contracts
+
+You can now pass a `--salt` flag in your forc deploy command to redeploy a contract that has been deployed already. This is useful for multiple deployments of the same contract.
+
+In order to use the `--salt` flag, install the latest `forc` update by running the following command in your project directory:
+
+```bash
+cargo add forc
+```
+
+Alternately, you can add the following to your `cargo.toml` file:
+
+```toml
+forc = "0.35.2"
+```
+
+Once `forc` is updated, can now add a `--salt` to your contractID while deploying the contract as follows:
+
+```bash
+forc deploy --salt <Salt> --node-url <key> --gas-price 1
+```
+
+> 💡 Note: Salt is 0x00000000000000000000000000000000 by default. If you do not want to pass a salt manually, you can also use the --random-salt flag to randomise your salt as below:
+
+```bash
+forc deploy --random-salt --node-url <key> --gas-price 1
+```
+
+And that's it! You just wrote, tested, and deployed an entire contract in Sway! 💪🛠🔥🚀🎉😎🌴✨.
 
 ## Keep building on Fuel
 
