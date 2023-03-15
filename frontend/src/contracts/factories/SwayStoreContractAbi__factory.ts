@@ -4,13 +4,13 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.29.1
-  Forc version: 0.32.2
-  Fuel-Core version: 0.15.1
+  Fuels version: 0.35.0
+  Forc version: 0.35.3
+  Fuel-Core version: 0.17.3
 */
 
 import { Interface, Contract } from "fuels";
-import type { Provider, BaseWalletLocked, AbstractAddress } from "fuels";
+import type { Provider, Account, AbstractAddress } from "fuels";
 import type { SwayStoreContractAbi, SwayStoreContractAbiInterface } from "../SwayStoreContractAbi";
 
 const _abi = {
@@ -33,12 +33,12 @@ const _abi = {
       "components": [
         {
           "name": "Address",
-          "type": 5,
+          "type": 7,
           "typeArguments": null
         },
         {
           "name": "ContractId",
-          "type": 6,
+          "type": 8,
           "typeArguments": null
         }
       ],
@@ -50,32 +50,17 @@ const _abi = {
       "components": [
         {
           "name": "IncorrectAssetId",
-          "type": 0,
-          "typeArguments": null
-        },
-        {
-          "name": "NotEnoughTokens",
           "type": 8,
           "typeArguments": null
         },
         {
+          "name": "NotEnoughTokens",
+          "type": 10,
+          "typeArguments": null
+        },
+        {
           "name": "OnlyOwner",
-          "type": 0,
-          "typeArguments": null
-        },
-        {
-          "name": "OwnerNotInitialized",
-          "type": 0,
-          "typeArguments": null
-        },
-        {
-          "name": "OwnerAlreadyInitialized",
-          "type": 0,
-          "typeArguments": null
-        },
-        {
-          "name": "IncorrectItemID",
-          "type": 0,
+          "type": 2,
           "typeArguments": null
         }
       ],
@@ -89,6 +74,18 @@ const _abi = {
     },
     {
       "typeId": 5,
+      "type": "str[21]",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 6,
+      "type": "str[25]",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 7,
       "type": "struct Address",
       "components": [
         {
@@ -100,7 +97,7 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 6,
+      "typeId": 8,
       "type": "struct ContractId",
       "components": [
         {
@@ -112,17 +109,17 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 7,
+      "typeId": 9,
       "type": "struct Item",
       "components": [
         {
           "name": "id",
-          "type": 8,
+          "type": 10,
           "typeArguments": null
         },
         {
           "name": "price",
-          "type": 8,
+          "type": 10,
           "typeArguments": null
         },
         {
@@ -137,14 +134,14 @@ const _abi = {
         },
         {
           "name": "total_bought",
-          "type": 8,
+          "type": 10,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 8,
+      "typeId": 10,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -155,7 +152,7 @@ const _abi = {
       "inputs": [
         {
           "name": "item_id",
-          "type": 8,
+          "type": 10,
           "typeArguments": null
         }
       ],
@@ -164,31 +161,60 @@ const _abi = {
         "name": "",
         "type": 0,
         "typeArguments": null
-      }
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        },
+        {
+          "name": "payable",
+          "arguments": []
+        }
+      ]
     },
     {
       "inputs": [],
       "name": "get_count",
       "output": {
         "name": "",
-        "type": 8,
+        "type": 10,
         "typeArguments": null
-      }
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
     },
     {
       "inputs": [
         {
           "name": "item_id",
-          "type": 8,
+          "type": 10,
           "typeArguments": null
         }
       ],
       "name": "get_item",
       "output": {
         "name": "",
-        "type": 7,
+        "type": 9,
         "typeArguments": null
-      }
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
     },
     {
       "inputs": [],
@@ -197,13 +223,22 @@ const _abi = {
         "name": "",
         "type": 2,
         "typeArguments": null
-      }
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
     },
     {
       "inputs": [
         {
           "name": "price",
-          "type": 8,
+          "type": 10,
           "typeArguments": null
         },
         {
@@ -217,7 +252,16 @@ const _abi = {
         "name": "",
         "type": 0,
         "typeArguments": null
-      }
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
     },
     {
       "inputs": [],
@@ -226,7 +270,15 @@ const _abi = {
         "name": "",
         "type": 0,
         "typeArguments": null
-      }
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
     }
   ],
   "loggedTypes": [
@@ -250,16 +302,16 @@ const _abi = {
       "logId": 2,
       "loggedType": {
         "name": "",
-        "type": 3,
-        "typeArguments": []
+        "type": 6,
+        "typeArguments": null
       }
     },
     {
       "logId": 3,
       "loggedType": {
         "name": "",
-        "type": 3,
-        "typeArguments": []
+        "type": 5,
+        "typeArguments": null
       }
     },
     {
@@ -277,16 +329,10 @@ const _abi = {
         "type": 3,
         "typeArguments": []
       }
-    },
-    {
-      "logId": 6,
-      "loggedType": {
-        "name": "",
-        "type": 3,
-        "typeArguments": []
-      }
     }
-  ]
+  ],
+  "messagesTypes": [],
+  "configurables": []
 }
 
 export class SwayStoreContractAbi__factory {
@@ -296,8 +342,8 @@ export class SwayStoreContractAbi__factory {
   }
   static connect(
     id: string | AbstractAddress,
-    walletOrProvider: BaseWalletLocked | Provider
+    accountOrProvider: Account | Provider
   ): SwayStoreContractAbi {
-    return new Contract(id, _abi, walletOrProvider) as unknown as SwayStoreContractAbi
+    return new Contract(id, _abi, accountOrProvider) as unknown as SwayStoreContractAbi
   }
 }

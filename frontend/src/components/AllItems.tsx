@@ -19,7 +19,6 @@ export default function AllItems({ contract }: AllItemsProps) {
         try {
           let { value } = await contract.functions.get_count().get();
           let formattedValue = parseFloat(value.format()) * 1_000_000_000;
-          console.log("COUNT:", formattedValue);
           setItemCount(formattedValue);
           let max = formattedValue + 1;
           let tempItems = [];

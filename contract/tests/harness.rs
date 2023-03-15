@@ -125,6 +125,7 @@ async fn can_list_and_buy_item() {
         .buy_item(1)
         .append_variable_outputs(1)
         .call_params(call_params)
+        .unwrap()
         .call()
         .await
         .unwrap();
@@ -197,6 +198,7 @@ async fn can_withdraw_funds() {
         .buy_item(1)
         .append_variable_outputs(1)
         .call_params(call_params)
+        .unwrap()
         .call()
         .await
         .unwrap();

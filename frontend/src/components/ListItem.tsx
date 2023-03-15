@@ -9,10 +9,11 @@ interface ListItemsProps {
 export default function ListItem({contract}: ListItemsProps){
     const [metadata, setMetadata] = useState<string>("");
     const [price, setPrice] = useState<string>("0");
-    const [status, setStatus] = useState<'success' | 'error' | 'none'>('none');
+    const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>){
         e.preventDefault();
+        setStatus('loading')
         if(contract !== null){
             try {
                 const priceInput = bn.parseUnits(price.toString());
@@ -68,6 +69,7 @@ export default function ListItem({contract}: ListItemsProps){
 
             {status === 'success' && <div>Item successfully listed!</div>}
             {status === 'error' && <div>Error listing item. Please try again.</div>}
+            {status === 'loading' && <div>Listing item...</div>}
         </div>
     )
 }

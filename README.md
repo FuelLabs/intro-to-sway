@@ -6,7 +6,7 @@ If you know JavaScript, you can quickly learn to build full-stack dapps, or dece
 
 A Sway contract for a decentralized Amazon-like marketplace.
 
-Make sure you have the Rust and Fuel toolchains installed. Install the beta-2 toolchain distribution and set it as your default.
+Make sure you have the Rust and Fuel toolchains installed. Install the beta-3 toolchain distribution and set it as your default.
 
 You can build the Sway contract with `forc build`.
 
@@ -20,7 +20,6 @@ Sway is backed by a powerful compiler and toolchain that work to abstract away c
 
 Part of what makes Sway so unique is the fantastic suite of tools surrounding it that help you turn a contract into a full-stack dapp:
 
-
 - 📚 Sway Standard Library: A native library of helpful types and methods.
 
 - 🧰 Forc: The Fuel toolbox that helps you build, deploy, and manage your Sway projects.
@@ -31,31 +30,19 @@ Part of what makes Sway so unique is the fantastic suite of tools surrounding it
 
 - ⚡ Fuels Typescript SDK: Test and interact with your Sway contract with TypeScript.
 
-- 🔭 Fuel Indexer: Easily make your own indexer to organize and query on-chain data.
-
-You can use Sway to write contracts, scripts, predicates, and libraries for the Fuel network.
-
-- 💼 A contract is a set of functions with persistent state that can be deployed on a blockchain. Once deployed, the contract lives on the blockchain and can never be changed or deleted. Anyone can access the state or call public functions without permission. 
-
-- 📋 A script is a function that gets compiled into bytecode and passed into a transaction to be executed. It cannot be deployed or called like a contract and cannot store persistent state.
-
-- 🔐 A predicate is a pure function that can return true or false, and is sent inside a transaction as bytecode and checked at transaction validity time. If it evaluates to false the transaction will not be processed, and no gas will be used. If it evaluates to true, any coins belonging to the address equal to the Merkle root of the predicate bytecode may be spent by the transaction.
-
-- 📗 A library is a set of shareable code that can be used in a contract, script, or predicate.
+- 🔭 Fuel Indexer: Make your own indexer to organize and query on-chain data.
 
 ## Dev Setup
 
 Before diving into any Sway code, ensure you have installed the following dependencies.
 
-Start by installing the [Rust toolchain](https://www.rust-lang.org/tools/install).
+Start by installing the [Fuel toolchain](https://github.com/FuelLabs/fuelup).
 
-Then, install the [Fuel toolchain](https://github.com/FuelLabs/fuelup).
-
-Install the beta-2 toolchain distribution and set it as your default with:
+Install the beta-3 toolchain distribution and set it as your default with:
 
 ```bash
-$ fuelup toolchain install beta-2
-$ fuelup default beta-2
+$ fuelup toolchain install beta-3
+$ fuelup default beta-3
 ```
 
 You can check to see the current toolchain version installed by running the following:
@@ -66,9 +53,11 @@ $ fuelup show
 
 Next, add the [Sway extension](https://marketplace.visualstudio.com/items?itemName=FuelLabs.sway-vscode-plugin) to your VS Code.
 
+If you want to be able to run tests in Rust, install the [Rust toolchain](https://www.rust-lang.org/tools/install).
+
 ## Writing a Contract
 
-> This example uses the `beta-2` toolchain, which is version `0.31.1` of `forc` and version `0.14.1` of `fuel-core`.
+> This example uses the `beta-3` toolchain, which is version `0.35.3` of `forc` and version `0.17.3` of `fuel-core`.
 
 Let's make a Sway contract for an online marketplace like Amazon, where sellers can list products, buyers can buy them, and the marketplace takes a cut of each purchase.
 
@@ -97,16 +86,16 @@ contract;
 The Sway standard library provides several utility types and methods we can use in our contract. To import a library, you can use the `use` keyword and `::`, also called a namespace qualifier, to chain library names like this:
 
 ```rust
-// imports the Address type from the std library
-use std::address::Address;
+// imports the msg_sender function from the std library
+use std::auth::msg_sender;
 ```
 
 You can also group together imports using curly brackets:
 
 ```rust
 use std::{
-    address::Address,
-    storage::StorageMap,
+    auth::msg_sender,
+    storage::StorageVec,
 }
 ```
 
@@ -114,24 +103,17 @@ For this contract, here is what needs to be imported:
 
 ```rust
 use std::{
-    auth::{
-        AuthError,
-        msg_sender,
-    },
+    auth::msg_sender,
     call_frames::msg_asset_id,
     constants::BASE_ASSET_ID,
     context::{
         msg_amount,
         this_balance,
     },
-    identity::Identity,
-    storage::{
-        StorageMap,
-        StorageVec,
-    },
     token::transfer,
 };
 ```
+
 We'll go through what each of these imports does as we use them later.
 
 ### Item Struct
@@ -152,7 +134,7 @@ struct Item {
 }
 ```
 
-The item struct will hold an ID, price, the owner's identity, a string for a URL or identifier where off-chain data about the item is stored (such as the description and photos), and a counter for the total number of purchases.
+The item struct will hold an ID, price, the owner's identity, a string for a URL or identifier where off-chain data about the item is stored (such as the description and photos), and a total bought counter to keep track of the total number of purchases.
 
 #### Types
 
@@ -189,7 +171,7 @@ abi SwayStore {
 
     // a function to buy an item
     // takes the item id as the arg
-    #[storage(read, write)]
+    #[storage(read, write), payable]
     fn buy_item(item_id: u64);
 
     // a function to get a certain item
@@ -203,6 +185,10 @@ abi SwayStore {
     // a function to withdraw contract funds
     #[storage(read)]
     fn withdraw_funds();
+
+    // return the number of items listed
+    #[storage(read)]
+    fn get_count() -> u64;
 }
 ``` 
 
@@ -213,6 +199,8 @@ A function is defined with the `fn` keyword. Sway uses snake case, so instead of
 You must define the return type using a skinny arrow if the function returns anything. If there are any parameters, the types must also be defined for those. Semicolons are *required* at the end of each line.
 
 If any function reads from or writes to storage, you must define that level of access above the function with either `#[storage(read)]` or `#[storage(read, write)]`.
+
+If you expect funds to be sent when a function is called, like the `buy_item` function, you must use the `#[payable]` annotation.
 
 ### Storage Block
 
@@ -226,9 +214,7 @@ storage {
     item_counter: u64 = 0,
     // map of item IDs to Items
     item_map: StorageMap<u64, Item> = StorageMap {},
-    // a vector of all purchases
-    // stores the item ID and buyer identity for all purchases
-    purchases: StorageVec<(u64, Identity)> = StorageVec {},
+    // owner of the contract
     owner: Option<Identity> = Option::None,
 }
 ```
@@ -236,6 +222,7 @@ storage {
 The first variable we have stored is `item_counter`, a number initialized to 0. You can use this counter to track the total number of items listed.
 
 #### StorageMap
+
 A StorageMap is a special type that allows you to save key-value pairs inside a storage block. 
 
 To define a storage map, you must specify the type for the key and value. For example, below, the type for the key is `u64`, and the type for the value is an `Item` struct.
@@ -246,24 +233,6 @@ item_map: StorageMap<u64, Item> = StorageMap{}
 
 Here, we are saving a mapping of the item's ID to the Item struct. With this, we can look up information about an item with the ID. 
 
-#### Tuples
-
-Tuples are like immutable, fixed-length arrays with predefined types at each index. You use parentheses to define a tuple:
-
-```rust
-let my_tuple: (u64, bool) = (5, true);
-```
-
-#### Storage Vector
-
-A `StorageVec`, or storage vector, is also a type you can use only in a storage block. It works a lot like an array in JavaScript. 
-
-To define a storage vector, specify the type that will be stored inside. For example, below, `purchases` will hold a vector of tuples that save a `u64` and an `Identity`, representing the item ID purchased and the `Address` or `ContractId` that bought the item.
-
-```rust
-purchases: StorageVec<(u64, Identity)> = StorageVec{}
-```
-
 #### Options
 
 Here we are setting the variable `owner` as a variable that could be `None` or could store an `Identity`.
@@ -272,20 +241,17 @@ Here we are setting the variable `owner` as a variable that could be `None` or c
 owner: Option<Identity> = Option::None
 ```
 
-If you want a value to be null or undefined under certain conditions, you can use an `Option` type, which is an enum that can be either Some(value) or None. The keyword `None` represents that no value exists, while the keyword `Some` means there is some value stored.
+If you want a value to be null or undefined under certain conditions, you can use an `Option` type, which is an enum that can be either `Some(value)` or `None`. The keyword `None` represents that no value exists, while the keyword `Some` means there is some value stored.
 
 ### Error Handling
 
-Enumerations, or enums, are a type that can be one of several variations. In our contract, you can use an enum to create custom errors to handle errors in a function. 
+Enumerations, or enums, are a type that can be one of several variations. In our contract, we can use an enum to create custom errors to handle errors in a function. 
 
 ```rust
 enum InvalidError {
-    IncorrectAssetId: (),
+    IncorrectAssetId: ContractId,
     NotEnoughTokens: u64,
-    OnlyOwner: (),
-    OwnerNotInitialized: (),
-    OwnerAlreadyInitialized: (),
-    IncorrectItemID: ()
+    OnlyOwner: Identity,
 }
 ```
 
@@ -293,11 +259,8 @@ In our contract, we can expect there to be some different situations where we wa
 1. Someone could try to pay for an item with the wrong currency.
 2. Someone could try to buy an item without having enough coins.
 3. Someone could try to withdraw funds from the contract who isn't the owner. 
-4. Someone could try to withdraw funds before the owner has been initialized.
-5. Someone could try to set the owner after the owner has already been initialized.
-6. Someone could try to buy an item that doesn't exist.
 
-We can define the return type for a variation with the unit type `()`, or empty tuple, which means no other value is returned, to label the error reason. For the `NotEnoughTokens` variation, we can return the number of coins by defining the return type as a `u64`.
+We can define the return types for each error. For the `IncorrectAssetId` error we can return the asset id sent, which is a `ContractId` type. For the `NotEnoughTokens` variation, we can return the number of coins by defining the return type as a `u64`. For the `OnlyOwner` Error, we can use the Identity of the message sender. 
 
 ### Contract Functions
 
@@ -310,7 +273,7 @@ impl SwayStore for Contract {
         
     }
 
-    #[storage(read, write)]
+    #[storage(read, write), payable]
     fn buy_item(item_id: u64) {
         
     }
@@ -329,6 +292,11 @@ impl SwayStore for Contract {
     fn withdraw_funds(){
         
     }
+
+    #[storage(read)]
+    fn get_count() -> u64{
+ 
+    }
 }
 ```
 
@@ -337,17 +305,17 @@ impl SwayStore for Contract {
 Our first function allows sellers to list an item for sale. They can set the item's price and a string that points to some externally-stored data about the item. 
 
 ```rust
- #[storage(read, write)]
+#[storage(read, write)]
 fn list_item(price: u64, metadata: str[20]) {
     // increment the item counter
-    storage.item_counter = storage.item_counter + 1;
+    storage.item_counter += 1;
     //  get the message sender
-    let sender: Result<Identity, AuthError> = msg_sender();
+    let sender = msg_sender().unwrap();
     // configure the item
     let new_item: Item = Item {
         id: storage.item_counter,
         price: price,
-        owner: sender.unwrap(),
+        owner: sender,
         metadata: metadata,
         total_bought: 0,
     };
@@ -361,7 +329,7 @@ fn list_item(price: u64, metadata: str[20]) {
 The first step is incrementing the `item_counter` from storage so we can use it as the item's ID. 
 
 ```rust
-storage.item_counter = storage.item_counter + 1;
+storage.item_counter += 1;
 ```
 
 #### Getting the message sender
@@ -379,10 +347,10 @@ enum Result<T, E> {
 }
 ```
 
-The `msg_sender` function returns a `Result` that is either an `Identity` or an `AuthError` (imported from the standard library) in the case of an error.
+The `msg_sender` function returns a `Result` that is either an `Identity` or an `AuthError` in the case of an error.
 
 ```rust
-let sender: Result<Identity, AuthError> = msg_sender();
+let sender = msg_sender().unwrap();
 ```
 
 To access the inner returned value, you can use the `unwrap` method, which returns the inner value if the `Result` is OK, and panics if the result is an error.
@@ -391,13 +359,13 @@ To access the inner returned value, you can use the `unwrap` method, which retur
 
 We can create a new item using the `Item` struct. Use the `item_counter` value from storage for the ID, set the price and metadata as the input parameters, and set `total_bought` to 0. 
 
-Because the `owner` field requires a type `Identity`, you can use the `unwrap` method on the `Result` type to get the `Identity` returned from `msg_sender()`.
+Because the `owner` field requires a type `Identity`, you can use the sender value returned from `msg_sender()`.
 
 ```rust
- let new_item: Item = Item {
+let new_item: Item = Item {
     id: storage.item_counter,
     price: price,
-    owner: sender.unwrap(),
+    owner: sender,
     metadata: metadata,
     total_bought: 0,
 };
@@ -417,23 +385,22 @@ Next, we want buyers to be able to buy an item that has been listed, which means
 - accept the item ID as a function parameter
 - make sure the buyer is paying the right price and using the right coins
 - increment the `total_bought` count for the item
-- add the purchase to the `purchases` storage vector
 - transfer the cost of the item to the seller minus some fee that the contract will keep
 
 ```rust
- #[storage(read, write)]
+#[storage(read, write), payable]
 fn buy_item(item_id: u64) {
     // get the asset id for the asset sent
     let asset_id = msg_asset_id();
     // require that the correct asset was sent
-    require(asset_id == BASE_ASSET_ID, InvalidError::IncorrectAssetId);
+    require(asset_id == BASE_ASSET_ID, InvalidError::IncorrectAssetId(asset_id));
 
     // get the amount of coins sent
     let amount = msg_amount();
+
     // get the item to buy
-    let mut item = storage.item_map.get(item_id);
-    // require the item to be set
-    require(item.id > 0, InvalidError::IncorrectItemID);
+    let mut item = storage.item_map.get(item_id).unwrap();
+
     // require that the amount is at least the price of the item
     require(amount >= item.price, InvalidError::NotEnoughTokens(amount));
 
@@ -442,11 +409,6 @@ fn buy_item(item_id: u64) {
     // update the item in the storage map
     storage.item_map.insert(item_id, item);
 
-    // get the identity of the sender
-    let sender: Result<Identity, AuthError> = msg_sender();
-
-    // add the purchase to the storage vector
-    storage.purchases.push((item_id, sender.unwrap()));
     // only charge commission if price is more than 1,000
     if amount > 1_000 {
         // for every 100 coins, the contract keeps 5
@@ -475,10 +437,10 @@ A `require` statement takes two arguments: a condition and a value that gets log
 
 Here the condition is that the `asset_id` must be equal to the `BASE_ASSET_ID`, which is the default asset used for the base blockchain that we imported from the standard library.
  
-If the asset is any different, or, for example, someone tries to buy an item with another coin, we can throw the custom error that we defined earlier.
+If the asset is any different, or, for example, someone tries to buy an item with another coin, we can throw the custom error that we defined earlier and pass in the `asset_id`.
 
 ```rust
-require(asset_id == BASE_ASSET_ID, InvalidError::IncorrectAssetId);
+require(asset_id == BASE_ASSET_ID, InvalidError::IncorrectAssetId(asset_id));
 ```
 
 Next, we can use the `msg_amount` function from the standard library to get the number of coins sent from the buyer.
@@ -489,20 +451,13 @@ let amount = msg_amount();
 
 To check that this amount isn't less than the item's price, we need to look up the item details using the `item_id` parameter.
 
-To get a value for a particular key in a storage map, we can use the `get` method and pass in the key value. If nothing has previously been stored for a key, this method will return a zero value of the same expected type. That means if someone passes an item ID to the function that hasn't been claimed, an Item struct of zero-equivalent values will be returned.
-
+To get a value for a particular key in a storage map, we can use the `get` method and pass in the key value. This method returns a `Result` type, so we can use the `unwrap` method here to access the item value. 
 
 ```rust
-let mut item = storage.item_map.get(item_id);
+let mut item = storage.item_map.get(item_id).unwrap();
 ```
 
 By default, all variables are immutable in Sway for both `let` and `const`. However, if you want to change the value of any variable, you have to declare it as mutable with the `mut` keyword. Because we'll update the item's `total_bought` value later, we need to define it as mutable.
-
-We'll want to ensure that the `item_id` passed is valid. Because the `get` method will return an Item struct with values of zero if the `item_id` is not valid, and the item ID of `0` is never used, we can check to see if the ID of the returned item is greater than zero to make sure the Item struct returned is valid.
-
-```rust
-require(item.id > 0, InvalidError::IncorrectItemID);
-```
 
 We also want to require that the number of coins sent to buy the item isn't less than the item's price.
 
@@ -516,13 +471,6 @@ We can increment the value for the item's `total_bought` field and then re-inser
 ```rust
 item.total_bought += 1;
 storage.item_map.insert(item_id, item);
-```
-
-We'll use the `msg_sender` function again to get the buyer's identity. Then, we can use the `push` method on the `StorageVec` to add a tuple with the item ID and the buyer's Identity to the `purchases` storage vector.
-
-```rust
-let sender: Result<Identity, AuthError> = msg_sender();
-storage.purchases.push((item_id, sender.unwrap()));
 ```
 
 #### Transferring payment
@@ -541,7 +489,7 @@ if amount > 1_000 {
 }
 ```
 
-In the if-condition above, we check if the amount sent exceeds 1,000. To visually separate a large number like `1000`, we can use an underscore, like `1_000`.
+In the if-condition above, we check if the amount sent exceeds 1,000. To visually separate a large number like `1000`, we can use an underscore, like `1_000`. If the base asset for this contract is ETH, this would be equal to 1,000 gwei. 
 
 If the amount exceeds 1,000, we calculate a commission and subtract that from the amount.
 
@@ -552,10 +500,9 @@ We can use the `transfer` function to send the amount to the item owner. The `tr
 To get the details for an item, we can create a read-only function that returns the `Item` struct for a given item ID.
 
 ```rust
-#[storage(read)]
+ #[storage(read)]
 fn get_item(item_id: u64) -> Item {
-    // returns the item for the given item_id
-    storage.item_map.get(item_id)
+    storage.item_map.get(item_id).unwrap()
 }
 ```
 
@@ -580,13 +527,13 @@ To make sure we are setting the owner `Identity` correctly, instead of hard-codi
 fn initialize_owner() -> Identity {
     let owner = storage.owner;
     // make sure the owner has NOT already been initialized
-    require(owner.is_none(), InvalidError::OwnerAlreadyInitialized);
+    require(owner.is_none(), "owner already initialized");
     // get the identity of the sender
-    let sender: Result<Identity, AuthError> = msg_sender(); 
+    let sender = msg_sender().unwrap(); 
     // set the owner to the sender's identity
-    storage.owner = Option::Some(sender.unwrap());
+    storage.owner = Option::Some(sender);
     // return the owner
-    sender.unwrap()
+    sender
 }
 ```
 
@@ -594,35 +541,35 @@ Because we only want to be able to call this function once (right after the cont
 
 ```rust
 let owner = storage.owner;
-require(owner.is_none(), InvalidError::OwnerAlreadyInitialized);
+require(owner.is_none(), "owner already initialized");
 ```
 
 To set the `owner` as the message sender, we'll need to convert the `Result` type to an `Option` type.
 
 ```rust
-let sender: Result<Identity, AuthError> = msg_sender(); 
-storage.owner = Option::Some(sender.unwrap());
+let sender = msg_sender().unwrap(); 
+storage.owner = Option::Some(sender);
 ```
 
 Last, we'll return the message sender's `Identity`.
 
 ```rust
-sender.unwrap()
+sender
 ```
 
 ### Withdraw funds
 
-The last function allows the owner to withdraw the funds that the contract has accrued.
+The `withdraw_funds` function allows the owner to withdraw the funds that the contract has accrued.
 
 ```rust
 #[storage(read)]
 fn withdraw_funds() {
     let owner = storage.owner;
     // make sure the owner has been initialized
-    require(owner.is_some(), InvalidError::OwnerNotInitialized);
-    let sender: Result<Identity, AuthError> = msg_sender(); 
+    require(owner.is_some(), "owner not initialized");
+    let sender = msg_sender().unwrap(); 
     // require the sender to be the owner
-    require(sender.unwrap() == owner.unwrap(), InvalidError::OnlyOwner);
+    require(sender == owner.unwrap(), InvalidError::OnlyOwner(sender));
 
     // get the current balance of this contract for the base asset
     let amount = this_balance(BASE_ASSET_ID);
@@ -644,8 +591,8 @@ require(owner.is_some(), InvalidError::OwnerNotInitialized);
 Next, we will require that the person trying to withdraw the funds is the owner.
 
 ```rust
-let sender: Result<Identity, AuthError> = msg_sender(); 
-require(sender.unwrap() == owner.unwrap(), InvalidError::OnlyOwner);
+let sender = msg_sender().unwrap();  
+require(sender == owner.unwrap(), InvalidError::OnlyOwner(sender));
 ```
 
 We can also ensure that there are funds to send using the `this_balance` function from the standard library, which returns the balance of this contract.
@@ -661,6 +608,17 @@ Finally, we will transfer the balance of the contract to the owner.
 transfer(amount, BASE_ASSET_ID, owner.unwrap());
 ```
 
+### Get the project count
+
+The last function we need to add is the `get_count` function, which is a simple getter function to return the `item_counter` variable in storage.
+
+```rust
+#[storage(read)]
+fn get_count() -> u64 {
+    storage.item_counter
+}
+```
+
 ## Testing the contract
 
 You can compile your contract by running `forc build` in the contract folder. And that's it! You just wrote an entire contract in Sway 💪🛠🔥🚀🎉😎🌴✨.
@@ -668,6 +626,8 @@ You can compile your contract by running `forc build` in the contract folder. An
 You can see the complete code for this contract plus example tests using the Rust SDK in this repo.
 
 To run the tests in `harness.rs`, use `cargo test`. To print to the console from the tests, use `cargo test -- --nocapture`.
+
+You can also find an example React frontend that uses the Fuels TypeScript SDK and Fuel Wallet SDKs to interact with this contract.
 
 ## Keep building on Fuel
 
@@ -677,11 +637,11 @@ Ready to keep building? You can dive deeper into Sway and Fuel in the resources 
 
 ✨ [Build a frontend with the TypeScript SDK](https://fuellabs.github.io/fuels-ts/)
 
-🦀 [Write tests with the Rust SDK](https://fuellabs.github.io/fuels-rs/)
+🦀 [Write tests with the Rust SDK](https://rust.fuel.network/master/)
 
-🔧 [Learn how to use Fuelup](https://fuellabs.github.io/fuelup/latest)
+🔧 [Learn how to use Fuelup](https://install.fuel.network/latest)
 
-🏃‍ [Follow the Fuel Quickstart](https://fuellabs.github.io/fuel-docs/master/developer-quickstart.html)
+🏃‍ [Follow the Fuel Quickstart](https://fuelbook.fuel.network/master/quickstart/developer-quickstart.html)
 
 📖 [See Example Sway Applications](https://github.com/FuelLabs/sway-applications)
 
@@ -689,4 +649,6 @@ Ready to keep building? You can dive deeper into Sway and Fuel in the resources 
 
 🐦 [Follow Sway Language on Twitter](https://twitter.com/SwayLang)
 
-👾 [Join the Fuel Discord](http://discord.com/invite/xfpK4Pe)
+👾 [Join the Fuel Discord](https://discord.com/invite/xfpK4Pe)
+
+❓ [Ask questions in the Fuel Forum](https://forum.fuel.network/)

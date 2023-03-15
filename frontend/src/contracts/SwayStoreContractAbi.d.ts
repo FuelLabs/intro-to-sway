@@ -4,28 +4,28 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.29.1
-  Forc version: 0.32.2
-  Fuel-Core version: 0.15.1
+  Fuels version: 0.35.0
+  Forc version: 0.35.3
+  Fuel-Core version: 0.17.3
 */
 
 import type {
-  Interface,
-  FunctionFragment,
-  DecodedValue,
-  Contract,
-  BytesLike,
   BigNumberish,
-  InvokeFunction,
   BN,
+  BytesLike,
+  Contract,
+  DecodedValue,
+  FunctionFragment,
+  Interface,
+  InvokeFunction,
 } from 'fuels';
 
 import type { Enum } from "./common";
 
 export type IdentityInput = Enum<{ Address: AddressInput, ContractId: ContractIdInput }>;
 export type IdentityOutput = Enum<{ Address: AddressOutput, ContractId: ContractIdOutput }>;
-export type InvalidErrorInput = Enum<{ IncorrectAssetId: [], NotEnoughTokens: BigNumberish, OnlyOwner: [], OwnerNotInitialized: [], OwnerAlreadyInitialized: [], IncorrectItemID: [] }>;
-export type InvalidErrorOutput = Enum<{ IncorrectAssetId: [], NotEnoughTokens: BN, OnlyOwner: [], OwnerNotInitialized: [], OwnerAlreadyInitialized: [], IncorrectItemID: [] }>;
+export type InvalidErrorInput = Enum<{ IncorrectAssetId: ContractIdInput, NotEnoughTokens: BigNumberish, OnlyOwner: IdentityInput }>;
+export type InvalidErrorOutput = Enum<{ IncorrectAssetId: ContractIdOutput, NotEnoughTokens: BN, OnlyOwner: IdentityOutput }>;
 
 export type AddressInput = { value: string };
 export type AddressOutput = AddressInput;
