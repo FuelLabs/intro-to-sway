@@ -20,7 +20,6 @@ Sway is backed by a powerful compiler and toolchain that work to abstract away c
 
 Part of what makes Sway so unique is the fantastic suite of tools surrounding it that help you turn a contract into a full-stack dapp:
 
-
 - 📚 Sway Standard Library: A native library of helpful types and methods.
 
 - 🧰 Forc: The Fuel toolbox that helps you build, deploy, and manage your Sway projects.
@@ -31,17 +30,7 @@ Part of what makes Sway so unique is the fantastic suite of tools surrounding it
 
 - ⚡ Fuels Typescript SDK: Test and interact with your Sway contract with TypeScript.
 
-- 🔭 Fuel Indexer: Easily make your own indexer to organize and query on-chain data.
-
-You can use Sway to write contracts, scripts, predicates, and libraries for the Fuel network.
-
-- 💼 A contract is a set of functions with persistent state that can be deployed on a blockchain. Once deployed, the contract lives on the blockchain and can never be changed or deleted. Anyone can access the state or call public functions without permission. 
-
-- 📋 A script is a function that gets compiled into bytecode and passed into a transaction to be executed. It cannot be deployed or called like a contract and cannot store persistent state.
-
-- 🔐 A predicate is a pure function that can return true or false, and is sent inside a transaction as bytecode and checked at transaction validity time. If it evaluates to false the transaction will not be processed, and no gas will be used. If it evaluates to true, any coins belonging to the address equal to the Merkle root of the predicate bytecode may be spent by the transaction.
-
-- 📗 A library is a set of shareable code that can be used in a contract, script, or predicate.
+- 🔭 Fuel Indexer: Make your own indexer to organize and query on-chain data.
 
 ## Dev Setup
 
@@ -68,7 +57,7 @@ If you want to be able to run tests in Rust, install the [Rust toolchain](https:
 
 ## Writing a Contract
 
-> This example uses the `beta-3` toolchain, which is version `0.35.0` of `forc` and version `0.17.0` of `fuel-core`.
+> This example uses the `beta-3` toolchain, which is version `0.35.3` of `forc` and version `0.17.3` of `fuel-core`.
 
 Let's make a Sway contract for an online marketplace like Amazon, where sellers can list products, buyers can buy them, and the marketplace takes a cut of each purchase.
 
@@ -97,15 +86,15 @@ contract;
 The Sway standard library provides several utility types and methods we can use in our contract. To import a library, you can use the `use` keyword and `::`, also called a namespace qualifier, to chain library names like this:
 
 ```rust
-// imports the Address type from the std library
-use std::address::Address;
+// imports the msg_sender function from the std library
+use std::auth::msg_sender;
 ```
 
 You can also group together imports using curly brackets:
 
 ```rust
 use std::{
-    address::Address,
+    auth::msg_sender,
     storage::StorageVec,
 }
 ```
@@ -227,7 +216,7 @@ storage {
     item_map: StorageMap<u64, Item> = StorageMap {},
     // owner of the contract
     owner: Option<Identity> = Option::None,
-}s
+}
 ```
 
 The first variable we have stored is `item_counter`, a number initialized to 0. You can use this counter to track the total number of items listed.
