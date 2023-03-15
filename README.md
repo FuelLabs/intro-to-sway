@@ -637,11 +637,11 @@ Ready to keep building? You can dive deeper into Sway and Fuel in the resources 
 
 ✨ [Build a frontend with the TypeScript SDK](https://fuellabs.github.io/fuels-ts/)
 
-🦀 [Write tests with the Rust SDK](https://fuellabs.github.io/fuels-rs/)
+🦀 [Write tests with the Rust SDK](https://rust.fuel.network/master/)
 
-🔧 [Learn how to use Fuelup](https://fuellabs.github.io/fuelup/latest)
+🔧 [Learn how to use Fuelup](https://install.fuel.network/latest)
 
-🏃‍ [Follow the Fuel Quickstart](https://fuellabs.github.io/fuel-docs/master/developer-quickstart.html)
+🏃‍ [Follow the Fuel Quickstart](https://fuelbook.fuel.network/master/quickstart/developer-quickstart.html)
 
 📖 [See Example Sway Applications](https://github.com/FuelLabs/sway-applications)
 
@@ -649,4 +649,6 @@ Ready to keep building? You can dive deeper into Sway and Fuel in the resources 
 
 🐦 [Follow Sway Language on Twitter](https://twitter.com/SwayLang)
 
-👾 [Join the Fuel Discord](http://discord.com/invite/xfpK4Pe)
+👾 [Join the Fuel Discord](https://discord.com/invite/xfpK4Pe)
+
+❓ [Ask questions in the Fuel Forum](https://forum.fuel.network/)
