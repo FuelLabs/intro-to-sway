@@ -7,35 +7,32 @@ import AllItems from "./components/AllItems";
 import ListItem from "./components/ListItem";
 import "./App.css";
 
-const CONTRACT_ID = "0xd715df667608312fe9f2e57f8e92d2dd0f5e23db94d8a27f63c3c5c74c01da77"
+const CONTRACT_ID = "0xaad1d848542870b0ac6b549d6f6260a2cc0578738ae0eeede3549d9f1484283d"
 
 function App() {
-  const [account, setAccount] = useState<string>();
   const [wallet, setWallet] = useState<WalletLocked>();
   const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
-  const isConnected = useIsConnected();
-  const [Fuel] = useFuel();
+  const [isConnected] = useIsConnected();
+  const [fuel] = useFuel();
 
   useEffect(() => {
     async function getAccounts() {
-      const currentAccount = await Fuel.currentAccount();
-      const tempWallet = await Fuel.getWallet(currentAccount)
-      setAccount(currentAccount);
+      const currentAccount = await fuel.currentAccount();
+      const tempWallet = await fuel.getWallet(currentAccount)
       setWallet(tempWallet)
     }
-    if (Fuel) getAccounts();
-  }, [Fuel]);
+    if (fuel) getAccounts();
+  }, [fuel]);
 
   const contract = useMemo(() => {
-    if (Fuel && account && wallet) {
+    if (fuel && wallet) {
       // Connects out Contract instance to the deployed contract
       // address using the given wallet.
       const contract = SwayStoreContractAbi__factory.connect(CONTRACT_ID, wallet);
-
       return contract;
     }
     return null;
-  }, [Fuel, account, wallet]);
+  }, [fuel, wallet]);
 
 
   return (
@@ -43,14 +40,14 @@ function App() {
       <header>
         <h1>Sway Marketplace</h1>
       </header>
-       <nav>
-          <ul>
-              <li className={active === 'all-items' ? "active-tab" : ""} onClick={() => setActive('all-items')}>See All Items</li>
-              <li className={active === 'list-item' ? "active-tab" : ""} onClick={() => setActive('list-item')}>List an Item</li>
-          </ul>
-        </nav>
+      <nav>
+        <ul>
+          <li className={active === 'all-items' ? "active-tab" : ""} onClick={() => setActive('all-items')}>See All Items</li>
+          <li className={active === 'list-item' ? "active-tab" : ""} onClick={() => setActive('list-item')}>List an Item</li>
+        </ul>
+      </nav>
 
-      {Fuel ? (
+      {fuel ? (
         <div>
           {isConnected ? (
             <div>
@@ -59,7 +56,7 @@ function App() {
             </div>
           ) : (
             <div>
-              <button onClick={() => Fuel.connect()}>Connect Wallet</button>
+              <button onClick={() => fuel.connect()}>Connect Wallet</button>
             </div>
           )}
         </div>

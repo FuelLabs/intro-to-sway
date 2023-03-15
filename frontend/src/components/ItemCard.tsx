@@ -10,18 +10,18 @@ interface ItemCardProps {
 const assetId = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 export default function ItemCard({ item, contract }: ItemCardProps) {
-  const [status, setStatus] = useState<"success" | "error" | "none">("none");
+  const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
 
   async function handleBuyItem() {
     if (contract !== null) {
+      setStatus('loading')
       try {
-        let resp = await contract.functions.buy_item(item.id)
+        await contract.functions.buy_item(item.id)
         .txParams({ variableOutputs: 1 })
         .callParams({
             forward: [item.price, assetId],
           })
         .call()
-        console.log("RESPONSE:", resp);
         setStatus("success");
       } catch (e) {
         console.log("ERROR:", e);
@@ -38,8 +38,7 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
       {status === 'success' && <div>Purchased ✅</div>}
       {status === 'error' && <div>Something went wrong ❌</div>}
       {status === 'none' &&  <button onClick={handleBuyItem}>Buy Item</button>}
-      
-     
+      {status === 'loading' && <div>Buying item..</div>}
     
     </div>
   );
