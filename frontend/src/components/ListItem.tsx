@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { SwayStoreContractAbi } from "../contracts";
+import { ContractAbi } from "../contracts";
 import { bn } from "fuels";
 
 interface ListItemsProps {
-  contract: SwayStoreContractAbi | null;
+  contract: ContractAbi | null;
 }
 
 export default function ListItem({contract}: ListItemsProps){

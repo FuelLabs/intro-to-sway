@@ -58,12 +58,12 @@ nav > ul > li {
   border-bottom: 4px solid #77b6d8;
 }
 
-.item-card > button {
+button {
   cursor: pointer;
   background: #054a9f;
   border: none;
   border-radius: 12px;
-  padding: 10px 0;
+  padding: 10px 20px;
   margin-top: 20px;
   font-size: 20px;
   color: white;
