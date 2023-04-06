@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { ItemOutput } from "../contracts/SwayStoreContractAbi";
-import { SwayStoreContractAbi } from "../contracts";
+import { ItemOutput } from "../contracts/ContractAbi";
+import { ContractAbi } from "../contracts";
 
 interface ItemCardProps {
-  contract: SwayStoreContractAbi | null;
+  contract: ContractAbi | null;
   item: ItemOutput;
 }
 
@@ -33,7 +33,7 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
     <div className="item-card">
       <div>Id: {parseFloat(item.id.format()) * 1_000_000_000}</div>
       <div>Metadata: {item.metadata}</div>
-      <div>Price: {parseFloat(item.price.format())}</div>
+      <div>Price: {parseFloat(item.price.format())} ETH</div>
       <div>Total Bought: {parseFloat(item.total_bought.format()) * 1_000_000_000}</div>
       {status === 'success' && <div>Purchased ✅</div>}
       {status === 'error' && <div>Something went wrong ❌</div>}

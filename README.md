@@ -53,7 +53,7 @@ $ fuelup show
 
 Next, add the [Sway extension](https://marketplace.visualstudio.com/items?itemName=FuelLabs.sway-vscode-plugin) to your VS Code.
 
-If you want to be able to run tests in Rust, install the [Rust toolchain](https://www.rust-lang.org/tools/install).
+If you want to be able to run tests in Rust, install the [Rust toolchain](https://www.rust-lang.org/tools/install) as well.
 
 ## Writing a Contract
 
@@ -70,10 +70,10 @@ We can start by creating a new folder called `sway-store`, and making a new cont
 ```bash
 $ mkdir sway-store
 $ cd sway-store
-$ forc new sway-store-contract
+$ forc new contract
 ```
 
-Open up the `sway-store-contract` folder in VS Code, and inside the `src` folder you should see a file called `main.sw`. This is where you will write your Sway contract. You can delete everything in this file.
+Open up the `contract` folder in VS Code, and inside the `src` folder you should see a file called `main.sw`. This is where you will write your Sway contract. You can delete everything in this file.
 
 The first line of the file is specially reserved to let the compiler know if we are writing a contract, script, predicate, or library. To define the file as a contract, use the `contract` keyword.
 
@@ -120,9 +120,9 @@ We'll go through what each of these imports does as we use them later.
 
 Struct is short for structure, which is a data structure similar to an object in JavaScript. You define a struct with the `struct` keyword and define the fields of a struct inside curly brackets.
 
-The core of our program is the ability to list, sell, get, etc. `items`.
+The core of our program is the ability to list, sell, and get `items`.
 
-You can define the `Item` type as shown below:
+Let's define the `Item` type as shown below:
 
 ```rust
 struct Item {
@@ -409,9 +409,9 @@ fn buy_item(item_id: u64) {
     // update the item in the storage map
     storage.item_map.insert(item_id, item);
 
-    // only charge commission if price is more than 1,000
-    if amount > 1_000 {
-        // for every 100 coins, the contract keeps 5
+    // only charge commission if price is more than 0.1 ETH
+    if amount > 100_000_000 {
+        // keep a 5% commission
         let commission = amount / 20;
         let new_amount = amount - commission;
         // send the payout minus commission to the seller
@@ -480,7 +480,7 @@ Finally, we can transfer the payment to the seller. It's always best to transfer
 We can subtract a fee for items that meet a certain price threshold using a conditional `if` statement. `if` statements in Sway don't use parentheses around the conditions, but otherwise look the same as in JavaScript.
 
 ```rust
-if amount > 1_000 {
+if amount > 100_000_000 {
     let commission = amount / 20;
     let new_amount = amount - commission;
     transfer(new_amount, asset_id, item.owner);
@@ -489,9 +489,9 @@ if amount > 1_000 {
 }
 ```
 
-In the if-condition above, we check if the amount sent exceeds 1,000. To visually separate a large number like `1000`, we can use an underscore, like `1_000`. If the base asset for this contract is ETH, this would be equal to 1,000 gwei. 
+In the if-condition above, we check if the amount sent exceeds 100,000,000. To visually separate a large number like `100000000`, we can use an underscore, like `100_000_000`. If the base asset for this contract is ETH, this would be equal to 0.1 ETH. 
 
-If the amount exceeds 1,000, we calculate a commission and subtract that from the amount.
+If the amount exceeds 0.1 ETH, we calculate a commission and subtract that from the amount.
 
 We can use the `transfer` function to send the amount to the item owner. The `transfer` function is imported from the standard library and takes three arguments: the number of coins to transfer, the asset ID of the coins, and an Identity to send the coins to. 
 
@@ -619,15 +619,566 @@ fn get_count() -> u64 {
 }
 ```
 
-## Testing the contract
+### Building the contract
 
 You can compile your contract by running `forc build` in the contract folder. And that's it! You just wrote an entire contract in Sway 💪🛠🔥🚀🎉😎🌴✨.
 
+To format your contract, run `forc fmt`.
+
+## Testing the contract
+
 You can see the complete code for this contract plus example tests using the Rust SDK in this repo.
+
+To generate your own test template in Rust, you can use `cargo-generate`:
+
+```
+cargo install cargo-generate
+cargo generate --init fuellabs/sway templates/sway-test-rs --name contract
+```
 
 To run the tests in `harness.rs`, use `cargo test`. To print to the console from the tests, use `cargo test -- --nocapture`.
 
-You can also find an example React frontend that uses the Fuels TypeScript SDK and Fuel Wallet SDKs to interact with this contract.
+## Deploying the contract
+
+You can find the instructions to deploy this contract in the official Fuel developer quickstart: https://fuelbook.fuel.network/master/quickstart/smart-contract.html#deploy-the-contract
+
+Make sure to deploy with the `--random-salt` flag, as this contract has been deployed.
+
+Once your contract is deployed, save your contract ID to use in the frontend.
+
+## Building the Frontend
+
+### Setup
+
+Initialize a new React app with TypeScript in the same parent folder as your contract using the command below.
+
+```shell
+npx create-react-app frontend --template typescript
+```
+
+Next, install the fuels Typescript and wallet SDKs in the frontend folder and generate types from your contract with `fuels typegen`.
+
+```shell
+cd frontend
+npm install fuels @fuel-wallet/sdk
+npx fuels typegen -i ../contract/out/debug/*-abi.json -o ./src/contracts
+```
+
+In the `tsconfig.json` file, add the line below in the `compilerOptions` object to add the Fuel wallet type on the window object.
+
+```json
+"types": ["@fuel-wallet/sdk"],
+```
+
+Open the `src/App.tsx` file, and replace the boilerplate code with the template below:
+
+```tsx
+import { useState, useEffect, useMemo } from "react";
+import { WalletLocked } from "fuels";
+import { ContractAbi__factory } from "./contracts"
+import './App.css';
+
+function App() {
+  return (
+    <div className="App">
+      <header>
+        <h1>Sway Marketplace</h1>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+```
+
+Finally, copy and paste the CSS code below in your `App.css` file to add some simple styling.
+
+```css
+.App {
+  text-align: center;
+}
+
+nav > ul {
+  list-style-type: none;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding-inline-start: 0;
+}
+
+nav > ul > li {
+  cursor: pointer;
+}
+
+.form-control{
+  text-align: left;
+  font-size: 18px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 400px;
+}
+
+.form-control > input {
+  margin-bottom: 1rem;
+}
+
+.form-control > button {
+  cursor: pointer;
+  background: #054a9f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 0;
+  font-size: 20px;
+}
+
+.items-container{
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1rem 0;
+}
+
+.item-card{
+  box-shadow: 0px 0px 10px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  max-width: 300px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.active-tab{
+  border-bottom: 4px solid #77b6d8;
+}
+
+button {
+  cursor: pointer;
+  background: #054a9f;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  font-size: 20px;
+  color: white;
+}
+```
+
+### Connecting to the contract
+
+At the top of the file, add your contract ID as a constant.
+
+```tsx
+const CONTRACT_ID = "0x..."
+``` 
+
+Next, create a new folder in the `src` folder called `hooks`, and copy and paste the `useFuel.tsx` and `useIsConnected.tsx` hooks from the example in this repo. You can also find them in the [offical wallet docs](https://wallet.fuel.network/docs/react/).
+
+In `App.tsx`, import both of these hooks.
+
+```tsx
+import { useIsConnected } from "./hooks/useIsConnected";
+import { useFuel } from "./hooks/useFuel";
+```
+
+In the `App` function, we can call these hooks like this:
+
+```tsx
+const [fuel] = useFuel();
+const [isConnected] = useIsConnected();
+```
+
+Now we can check if the user has the fuel wallet installed and check if it's connected. 
+
+If the user doesn't have the `fuel` object in their window, we know that they don't have the Fuel wallet extention installed.
+If they have it installed, we can then check if the wallet is connected.
+
+```tsx
+{fuel ? (
+    <div>
+        {isConnected ? (
+            <div>Connected!</div>
+        ) : (
+            <div>
+                <button onClick={() => fuel.connect()}>Connect Wallet</button>
+            </div>
+        )}
+    </div>
+    ) : (
+    <div>
+        Download the{" "}
+        <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href="https://wallet.fuel.network/"
+        >
+        Fuel Wallet
+        </a>{" "}
+        to use the app.
+    </div>
+)}
+```
+
+Next, let's add a state variable called `wallets` with the `useState` hook, which will have the type `WalletLocked`.
+
+You can think of a locked wallet as a user wallet you can't sign transactions for, and an unlocked wallet as a wallet where you have the private key and are able to sign transactions.
+
+```tsx
+const [wallet, setWallet] = useState<WalletLocked>();
+```
+
+We can then use the `useEffect` hook below to get the connected wallet account.
+
+```tsx
+useEffect(() => {
+    async function getAccounts() {
+      const currentAccount = await fuel.currentAccount();
+      const tempWallet = await fuel.getWallet(currentAccount)
+      setWallet(tempWallet)
+    }
+    if (fuel) getAccounts();
+  }, [fuel]);
+```
+
+Next, we can use the `useMemo` hook to connect to our contract with the connected wallet.
+
+```tsx
+ const contract = useMemo(() => {
+    if (fuel && wallet) {
+      const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
+      return contract;
+    }
+    return null;
+  }, [fuel, wallet]);
+```
+
+Now we have our contract connection ready. You can console log the contract here to make sure this is working correctly.
+
+### UI
+
+In our app we're going to have two tabs: one to see all of the items listed for sale, and one to list a new item for sale.
+
+Let's add another state variable called `active` that we can use to toggle between our tabs. We can set the default tab to show all listed items.
+
+```tsx
+const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
+```
+
+Below the header, add a nav section to toggle between the two options.
+
+```tsx
+<nav>
+    <ul>
+        <li
+        className={active === 'all-items' ? "active-tab" : ""}
+        onClick={() => setActive('all-items')}
+        >
+        See All Items
+        </li>
+        <li
+        className={active === 'list-item' ? "active-tab" : ""}
+        onClick={() => setActive('list-item')}
+        >
+        List an Item
+        </li>
+    </ul>
+</nav>
+```
+
+Next we can create our components to show and list items.
+
+### Listing an Item
+
+Create a new folder in the `src` folder called `components`, and create a file there component called `ListItem.tsx`.
+
+At the top of the file, import the `useState` hook from `react`, the generated contract ABI from the `contracts` folder, and `bn` (big number) type from `fuels`.
+
+```tsx
+import { useState } from "react";
+import { ContractAbi } from "../contracts";
+import { bn } from "fuels";
+```
+
+This component will take the contract we made in `App.tsx` as a prop, so let's create an interface for the component.
+
+```tsx
+interface ListItemsProps {
+  contract: ContractAbi | null;
+}
+```
+
+We can set up the template for the function like this.
+
+```tsx
+export default function ListItem({contract}: ListItemsProps){
+    return (
+        <div>
+            <h2>List an Item</h2>
+        </div>
+    )
+}
+```
+
+To list an item, we'll create a form where the user can input the metadata string and price for the item they want to list. 
+Let's start by adding some state variables for the `metadata` and `price`. We can also add a `status` variable to track the submit status.
+
+```tsx
+const [metadata, setMetadata] = useState<string>("");
+const [price, setPrice] = useState<string>("0");
+const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
+```
+
+Under the heading, add the code below for the form:
+
+```tsx
+{status === 'none' &&
+    <form onSubmit={handleSubmit}>
+        <div className="form-control">
+            <label htmlFor="metadata">Item Metadata:</label>
+            <input 
+                id="metadata" 
+                type="text" 
+                pattern="\w{20}" 
+                title="The metatdata must be 20 characters"
+                required 
+                onChange={(e) => setMetadata(e.target.value)}
+            />
+        </div>
+
+        <div className="form-control">
+            <label htmlFor="price">Item Price:</label>
+            <input
+                id="price"
+                type="number"
+                required
+                min="0"
+                step="any"
+                inputMode="decimal"
+                placeholder="0.00"
+                onChange={(e) => {
+                    setPrice(e.target.value);
+                }}
+                />
+        </div>
+
+        <div className="form-control">
+            <button type="submit">List item</button>
+        </div>
+    </form>
+}
+
+{status === 'success' && <div>Item successfully listed!</div>}
+{status === 'error' && <div>Error listing item. Please try again.</div>}
+{status === 'loading' && <div>Listing item...</div>}
+```
+
+Finally, we need to add the `handleSubmit` function. 
+We can use the contract prop to call the `list_item` function and pass in the `price` and `metadata` from the form.
+
+```tsx
+async function handleSubmit(e: React.FormEvent<HTMLFormElement>){
+    e.preventDefault();
+    setStatus('loading')
+    if(contract !== null){
+        try {
+            const priceInput = bn.parseUnits(price.toString());
+            await contract.functions.list_item(priceInput, metadata).call();
+            setStatus('success')
+        } catch (e) {
+            console.log("ERROR:", e);
+            setStatus('error')
+        }
+    } else {
+        console.log("ERROR: Contract is null");
+    }
+}
+```
+
+Now that we have this component, let's add it to our `App.tsx` file and try it out.
+
+Import the `ListItem` component at the top of the file.
+Then, replace where it says `Connected!` with the code below:
+
+```tsx
+{active === 'all-items' && <div>All Items</div>}
+{active === 'list-item' && <ListItem contract={contract} />}
+```
+
+Now, try listing an item to make sure this works. 
+You should see the message `Item successfully listed!`.
+
+### Show All Items
+
+Next, let's create a new file called `AllItems.tsx` in the `components` folder.
+
+Copy and paste the template code below for this component:
+
+```tsx
+import { useState, useEffect } from "react";
+import { ContractAbi } from "../contracts";
+import { ItemOutput } from "../contracts/ContractAbi";
+
+interface AllItemsProps {
+  contract: ContractAbi | null;
+}
+export default function AllItems({ contract }: AllItemsProps) {
+    return (
+        <div>
+            <h2>All Items</h2>
+        </div>
+    )
+}
+```
+
+Here we can get the item count to see how many items are listed, and then loop through each of them to get the item details.
+
+First, let's create some state variables to store the number of items listed, an array of the item details, and the loading status.
+
+```tsx
+const [itemCount, setItemCount] = useState<number>(0);
+const [items, setItems] = useState<ItemOutput[]>([]);
+const [status, setStatus] = useState<'success' | 'loading' | 'error'>('loading');
+```
+
+Next, let's fetch the items in a `useEffect` hook.
+Because these are read-only functions, we can simulate a dry-run of the transaction by using the `get` method instead of `call` so the user doesn't have to sign anything.
+
+```tsx
+useEffect(() => {
+    async function getAllItems() {
+      if (contract !== null) {
+        try {
+          let { value } = await contract.functions.get_count().get();
+          let formattedValue = parseFloat(value.format()) * 1_000_000_000;
+          setItemCount(formattedValue);
+          let max = formattedValue + 1;
+          let tempItems = [];
+          for(let i=1; i < max; i++){
+            let resp = await contract.functions.get_item(i).get();
+            tempItems.push(resp.value);
+          }
+          setItems(tempItems);
+          setStatus('success');
+        } catch (e) {
+          setStatus('error');
+          console.log("ERROR:", e);
+        }
+      }
+    }
+    getAllItems();
+  }, [contract]);
+```
+
+If the item count is greater than `0` and we are able to successfully load the items, we can map through them and display an item card.
+
+The item card will show the item details and a buy button to buy that item, so we'll need to pass the contract and the item as props.
+
+```tsx
+{status === 'success' &&
+<div>
+    {itemCount === 0 ? (
+    <div>Uh oh! No items have been listed yet</div>
+    ) : (
+    <div>
+        <div>Total items: {itemCount}</div>
+        <div className="items-container">
+            {items.map((item) => (
+                <ItemCard key={item.id.format()} contract={contract} item={item}/>
+            ))}
+        </div>
+    </div>
+    )}
+</div>
+}
+{status === 'error' && <div>Something went wrong, try reloading the page.</div>}
+{status === 'loading' && <div>Loading...</div>}
+```
+
+### Item Card
+
+Now let's create the item card component. 
+Create a new file called `ItemCard.tsx` in the components folder, and copy and paste the template code below.
+
+```tsx
+import { useState } from "react";
+import { ItemOutput } from "../contracts/ContractAbi";
+import { ContractAbi } from "../contracts";
+
+interface ItemCardProps {
+    contract: ContractAbi | null;
+    item: ItemOutput;
+}
+
+export default function ItemCard({ item, contract }: ItemCardProps) {
+    return (
+        <div className="item-card">
+        </div>
+    )
+}
+```
+
+Add a `status` variable to track the status of the buy button.
+
+```tsx
+const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
+```
+
+Then add the item details and status messages to the card.
+
+```tsx
+<div className="item-card">
+    <div>Id: {parseFloat(item.id.format()) * 1_000_000_000}</div>
+    <div>Metadata: {item.metadata}</div>
+    <div>Price: {parseFloat(item.price.format())} ETH</div>
+    <div>Total Bought: {parseFloat(item.total_bought.format()) * 1_000_000_000}</div>
+    {status === 'success' && <div>Purchased ✅</div>}
+    {status === 'error' && <div>Something went wrong ❌</div>}
+    {status === 'none' &&  <button onClick={handleBuyItem}>Buy Item</button>}
+    {status === 'loading' && <div>Buying item...</div>}
+</div>
+```
+
+Create a new async function called `handleBuyItem`.
+Because this function is payable and transfers coins to the item owner, we'll need to do a couple special things here.
+
+Whenever we call any function that uses the transfer or mint functions in Sway, we have to append the matching number of variable outputs to the call with the `txParams` method. Because the `buy_item` function just transfers assets to the item owner, the number of variable outputs is `1`.
+
+Next, because this function is payable and the user needs to transfer the price of the item, we'll use the `callParams` method to forward the amount. With Fuel you can transfer any type of asset, so we need to specify both the amount and the asset ID.
+
+```tsx
+const assetId = "0x0000000000000000000000000000000000000000000000000000000000000000"
+
+async function handleBuyItem() {
+    if (contract !== null) {
+        setStatus('loading')
+        try {
+        await contract.functions.buy_item(item.id)
+        .txParams({ variableOutputs: 1 })
+        .callParams({
+            forward: [item.price, assetId],
+            })
+        .call()
+        setStatus("success");
+        } catch (e) {
+        console.log("ERROR:", e);
+        }
+    }
+}
+```
+
+Go back to `AllItems.tsx` and import the `ItemCard` component we just made.
+
+Finally, in `App.tsx`, import the `AllItems` component and replace `{active === 'all-items' && <div>All Items</div>}` with the line below:
+
+```tsx
+{active === 'all-items' && <AllItems contract={contract} />}
+```
+
+Now you should be able to see and buy all of the items listed in your contract.
+
+And that's it for the frontend! You just created a whole dapp on Fuel! 
 
 ## Keep building on Fuel
 
@@ -645,7 +1196,7 @@ Ready to keep building? You can dive deeper into Sway and Fuel in the resources 
 
 📖 [See Example Sway Applications](https://github.com/FuelLabs/sway-applications)
 
-⚡️ [Learn about Fuel](https://fuellabs.github.io/fuel-docs/master/)
+⚡️ [Learn about Fuel](https://fuelbook.fuel.network/)
 
 🐦 [Follow Sway Language on Twitter](https://twitter.com/SwayLang)
 

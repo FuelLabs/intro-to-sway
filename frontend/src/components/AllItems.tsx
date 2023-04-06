@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
-import { SwayStoreContractAbi } from "../contracts";
-import { ItemOutput } from "../contracts/SwayStoreContractAbi";
+import { ContractAbi } from "../contracts";
+import { ItemOutput } from "../contracts/ContractAbi";
 import ItemCard from "./ItemCard";
 
 interface AllItemsProps {
-  contract: SwayStoreContractAbi | null;
+  contract: ContractAbi | null;
 }
 
 export default function AllItems({ contract }: AllItemsProps) {
   const [items, setItems] = useState<ItemOutput[]>([]);
   const [itemCount, setItemCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<'success' | 'loading' | 'error'>('loading');
 
   useEffect(() => {
     async function getAllItems() {
@@ -27,9 +26,9 @@ export default function AllItems({ contract }: AllItemsProps) {
             tempItems.push(resp.value)
           }
           setItems(tempItems)
-          setLoading(false)
+          setStatus('success')
         } catch (e) {
-          setError("Something went wrong, try reloading the page.")
+          setStatus('error')
           console.log("ERROR:", e);
         }
       }
@@ -40,9 +39,7 @@ export default function AllItems({ contract }: AllItemsProps) {
   return (
     <div>
       <h2>All Items</h2>
-      {error && <div>{error}</div>}
-      {loading && error === null && <div>Loading...</div>}
-      {!loading &&
+      {status === 'success' &&
         <div>
           {itemCount === 0 ? (
             <div>Uh oh! No items have been listed yet</div>
@@ -58,6 +55,8 @@ export default function AllItems({ contract }: AllItemsProps) {
           )}
         </div>
       }
+      {status === 'error' && <div>Something went wrong, try reloading the page.</div>}
+      {status === 'loading' && <div>Loading...</div>}
     </div>
   );
 }

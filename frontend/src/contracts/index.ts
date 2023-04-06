@@ -4,11 +4,11 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.35.0
-  Forc version: 0.35.3
+  Fuels version: 0.38.0
+  Forc version: 0.35.5
   Fuel-Core version: 0.17.3
 */
 
-export type { SwayStoreContractAbi } from './SwayStoreContractAbi';
+export type { ContractAbi } from './ContractAbi';
 
-export { SwayStoreContractAbi__factory } from './factories/SwayStoreContractAbi__factory';
+export { ContractAbi__factory } from './factories/ContractAbi__factory';

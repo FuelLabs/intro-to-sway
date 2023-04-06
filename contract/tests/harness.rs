@@ -1,9 +1,9 @@
 use fuels::{prelude::*, tx::AssetId, tx::ContractId, types::{Identity, SizedAsciiString}};
 
 // Load abi from json
-abigen!(Contract(name="SwayStore", abi="out/debug/sway_store_contract-abi.json"));
+abigen!(Contract(name="SwayStore", abi="out/debug/contract-abi.json"));
 
-async fn get_contract_instance() -> (SwayStore, ContractId, Vec<WalletUnlocked>) {
+async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<WalletUnlocked>) {
     // Launch a local network and deploy the contract
     let wallets = launch_custom_provider_and_get_wallets(
         WalletsConfig::new(
@@ -19,12 +19,9 @@ async fn get_contract_instance() -> (SwayStore, ContractId, Vec<WalletUnlocked>)
     let wallet = wallets.get(0).unwrap().clone();
 
     let id = Contract::deploy(
-        "./out/debug/sway_store_contract.bin",
+        "./out/debug/contract.bin",
         &wallet,
-        TxParameters::default(),
-        StorageConfiguration::with_storage_path(Some(
-            "./out/debug/sway_store_contract-storage_slots.json".to_string(),
-        )),
+        DeployConfiguration::default(),
     )
     .await
     .unwrap();
@@ -43,7 +40,7 @@ async fn can_set_owner() {
 
     // initialize wallet_1 as the owner
     let owner_result = instance
-        .with_wallet(wallet_1.clone())
+        .with_account(wallet_1.clone())
         .unwrap()
         .methods()
         .initialize_owner()
@@ -66,7 +63,7 @@ async fn can_set_owner_only_once() {
 
     // initialize wallet_1 as the owner
     let _owner_result = instance
-        .with_wallet(wallet_1.clone())
+        .with_account(wallet_1.clone())
         .unwrap()
         .methods()
         .initialize_owner()
@@ -77,7 +74,7 @@ async fn can_set_owner_only_once() {
     // this should fail
     // try to set the owner from wallet_2
     let _fail_owner_result = instance
-        .with_wallet(wallet_2.clone())
+        .with_account(wallet_2.clone())
         .unwrap()
         .methods()
         .initialize_owner()
@@ -103,7 +100,7 @@ async fn can_list_and_buy_item() {
 
     // list item 1 from wallet_1
     let _item_1_result = instance
-        .with_wallet(wallet_1.clone())
+        .with_account(wallet_1.clone())
         .unwrap()
         .methods()
         .list_item(item_1_price, item_1_metadata)
@@ -111,15 +108,12 @@ async fn can_list_and_buy_item() {
         .await
         .unwrap();
 
-    // Bytes representation of the asset ID of the "base" asset used for gas fees.
-    const BASE_ASSET_ID: AssetId = AssetId::new([0u8; 32]);
-
     // call params to send the project price in the buy_item fn
-    let call_params = CallParameters::new(Some(item_1_price), Some(BASE_ASSET_ID), None);
+    let call_params = CallParameters::default().set_amount(item_1_price);
 
     // buy item 1 from wallet_2
     let _item_1_purchase = instance
-        .with_wallet(wallet_2.clone())
+        .with_account(wallet_2.clone())
         .unwrap()
         .methods()
         .buy_item(1)
@@ -157,7 +151,7 @@ async fn can_withdraw_funds() {
 
     // initialize wallet_1 as the owner
     let owner_result = instance
-        .with_wallet(wallet_1.clone())
+        .with_account(wallet_1.clone())
         .unwrap()
         .methods()
         .initialize_owner()
@@ -172,27 +166,33 @@ async fn can_withdraw_funds() {
     let item_1_metadata: SizedAsciiString<20> = "metadata__url__here_"
         .try_into()
         .expect("Should have succeeded");
-    let item_1_price: u64 = 15_000;
+    let item_1_price: u64 = 150_000_000;
 
     // list item 1 from wallet_2
-    let _item_1_result = instance
-        .with_wallet(wallet_2.clone())
+    let item_1_result = instance
+        .with_account(wallet_2.clone())
         .unwrap()
         .methods()
         .list_item(item_1_price, item_1_metadata)
         .call()
+        .await;
+    assert!(item_1_result.is_ok());
+
+    // make sure the item count increased
+    let count = instance
+        .methods()
+        .get_count()
+        .simulate()
         .await
         .unwrap();
-
-    // Bytes representation of the asset ID of the "base" asset used for gas fees.
-    const BASE_ASSET_ID: AssetId = AssetId::new([0u8; 32]);
+    assert_eq!(count.value, 1);
 
     // call params to send the project price in the buy_item fn
-    let call_params = CallParameters::new(Some(item_1_price), Some(BASE_ASSET_ID), None);
-
+    let call_params = CallParameters::default().set_amount(item_1_price);
+    
     // buy item 1 from wallet_3
-    let _item_1_purchase = instance
-        .with_wallet(wallet_3.clone())
+    let item_1_purchase = instance
+        .with_account(wallet_3.clone())
         .unwrap()
         .methods()
         .buy_item(1)
@@ -200,19 +200,31 @@ async fn can_withdraw_funds() {
         .call_params(call_params)
         .unwrap()
         .call()
-        .await
-        .unwrap();
+        .await;
+    assert!(item_1_purchase.is_ok());
+
+     // make sure the item's total_bought count increased
+     let listed_item = instance
+     .methods()
+     .get_item(1)
+     .simulate()
+     .await
+     .unwrap();
+ assert_eq!(listed_item.value.total_bought, 1);
 
     // withdraw the balance from the owner's wallet
-    let _resp = instance
-        .with_wallet(wallet_1.clone())
+    let withdraw = instance
+        .with_account(wallet_1.clone())
         .unwrap()
         .methods()
         .withdraw_funds()
         .append_variable_outputs(1)
         .call()
-        .await
-        .unwrap();
+        .await;
+    assert!(withdraw.is_ok());
+
+     // Bytes representation of the asset ID of the "base" asset used for gas fees.
+     const BASE_ASSET_ID: AssetId = AssetId::new([0u8; 32]);
 
     // check the balances of wallet_1 and wallet_2
     let balance_1: u64 = wallet_1.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
@@ -220,9 +232,9 @@ async fn can_withdraw_funds() {
     let balance_3: u64 = wallet_3.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
 
     // println!("BALANCE 1: {:?}", balance_1);
-    assert!(balance_1 == 1000000750);
+    assert!(balance_1 == 1007500000);
     // println!("BALANCE 2: {:?}", balance_2);
-    assert!(balance_2 == 1000014250);
+    assert!(balance_2 == 1142500000);
     // println!("BALANCE 3: {:?}", balance_3);
-    assert!(balance_3 == 999985000);
+    assert!(balance_3 == 850000000);
 }

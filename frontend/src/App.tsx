@@ -2,18 +2,18 @@ import { useState, useEffect, useMemo } from "react";
 import { useIsConnected } from "./hooks/useIsConnected";
 import { useFuel } from "./hooks/useFuel";
 import { WalletLocked } from "fuels";
-import { SwayStoreContractAbi__factory } from "./contracts"
+import { ContractAbi__factory } from "./contracts"
 import AllItems from "./components/AllItems";
 import ListItem from "./components/ListItem";
 import "./App.css";
 
-const CONTRACT_ID = "0xaad1d848542870b0ac6b549d6f6260a2cc0578738ae0eeede3549d9f1484283d"
+const CONTRACT_ID = "0xf7cea6129391fb4b5b0fb9dda9814a248ea64723abbcdf43711684c95d3d950f"
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
-  const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
   const [isConnected] = useIsConnected();
   const [fuel] = useFuel();
+  const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
 
   useEffect(() => {
     async function getAccounts() {
@@ -26,9 +26,7 @@ function App() {
 
   const contract = useMemo(() => {
     if (fuel && wallet) {
-      // Connects out Contract instance to the deployed contract
-      // address using the given wallet.
-      const contract = SwayStoreContractAbi__factory.connect(CONTRACT_ID, wallet);
+      const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
     }
     return null;

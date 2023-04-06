@@ -102,9 +102,9 @@ impl SwayStore for Contract {
         // update the item in the storage map
         storage.item_map.insert(item_id, item);
 
-        // only charge commission if price is more than 1,000
-        if amount > 1_000 {
-            // for every 100 coins, the contract keeps 5
+        // only charge commission if price is more than 0.1 ETH
+        if amount > 100_000_000 {
+            // keep a 5% commission
             let commission = amount / 20;
             let new_amount = amount - commission;
             // send the payout minus commission to the seller
