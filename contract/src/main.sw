@@ -57,7 +57,7 @@ storage {
 }
 
 enum InvalidError {
-    IncorrectAssetId: ContractId,
+    IncorrectAssetId: AssetId,
     NotEnoughTokens: u64,
     OnlyOwner: Identity,
 }
@@ -66,19 +66,19 @@ impl SwayStore for Contract {
     #[storage(read, write)]
     fn list_item(price: u64, metadata: str[20]) {
         // increment the item counter
-        storage.item_counter += 1;
+        storage.item_counter.write(storage.item_counter.read() + 1);
         //  get the message sender
         let sender = msg_sender().unwrap();
         // configure the item
         let new_item: Item = Item {
-            id: storage.item_counter,
+            id: storage.item_counter.read(),
             price: price,
             owner: sender,
             metadata: metadata,
             total_bought: 0,
         };
         // save the new item to storage using the counter value
-        storage.item_map.insert(storage.item_counter, new_item);
+        storage.item_map.insert(storage.item_counter.read(), new_item);
     }
 
     #[storage(read, write), payable]
@@ -92,7 +92,7 @@ impl SwayStore for Contract {
         let amount = msg_amount();
 
         // get the item to buy
-        let mut item = storage.item_map.get(item_id).unwrap();
+        let mut item = storage.item_map.get(item_id).try_read().unwrap();
 
         // require that the amount is at least the price of the item
         require(amount >= item.price, InvalidError::NotEnoughTokens(amount));
@@ -108,35 +108,35 @@ impl SwayStore for Contract {
             let commission = amount / 20;
             let new_amount = amount - commission;
             // send the payout minus commission to the seller
-            transfer(new_amount, asset_id, item.owner);
+            transfer(item.owner, asset_id, new_amount);
         } else {
             // send the full payout to the seller
-            transfer(amount, asset_id, item.owner);
+            transfer(item.owner, asset_id, amount);
         }
     }
 
     #[storage(read)]
     fn get_item(item_id: u64) -> Item {
         // returns the item for the given item_id
-        storage.item_map.get(item_id).unwrap()
+        storage.item_map.get(item_id).try_read().unwrap()
     }
 
     #[storage(read, write)]
     fn initialize_owner() -> Identity {
-        let owner = storage.owner;
+        let owner = storage.owner.read();
         // make sure the owner has NOT already been initialized
         require(owner.is_none(), "owner already initialized");
         // get the identity of the sender
         let sender = msg_sender().unwrap(); 
         // set the owner to the sender's identity
-        storage.owner = Option::Some(sender);
+        storage.owner.write(Option::Some(sender));
         // return the owner
         sender
     }
 
     #[storage(read)]
     fn withdraw_funds() {
-        let owner = storage.owner;
+        let owner = storage.owner.read();
         // make sure the owner has been initialized
         require(owner.is_some(), "owner not initialized");
         let sender = msg_sender().unwrap(); 
@@ -149,11 +149,11 @@ impl SwayStore for Contract {
         // require the contract balance to be more than 0
         require(amount > 0, InvalidError::NotEnoughTokens(amount));
         // send the amount to the owner
-        transfer(amount, BASE_ASSET_ID, owner.unwrap());
+        transfer(owner.unwrap(), BASE_ASSET_ID, amount);
     }
 
     #[storage(read)]
     fn get_count() -> u64 {
-        storage.item_counter
+        storage.item_counter.read()
     }
 }
