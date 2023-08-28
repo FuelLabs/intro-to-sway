@@ -7,7 +7,7 @@ import AllItems from "./components/AllItems";
 import ListItem from "./components/ListItem";
 import "./App.css";
 
-const CONTRACT_ID = "0xf7cea6129391fb4b5b0fb9dda9814a248ea64723abbcdf43711684c95d3d950f"
+const CONTRACT_ID = "0x3b2d4c440e6b29772d8437b568d231ffbf823f23fbd9643a48fa5338c126e487"
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
