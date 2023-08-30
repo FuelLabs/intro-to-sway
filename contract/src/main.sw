@@ -66,19 +66,19 @@ impl SwayStore for Contract {
     #[storage(read, write)]
     fn list_item(price: u64, metadata: str[20]) {
         // increment the item counter
-        storage.item_counter.write(storage.item_counter.read() + 1);
+        storage.item_counter.write(storage.item_counter.try_read().unwrap() + 1);
         //  get the message sender
         let sender = msg_sender().unwrap();
         // configure the item
         let new_item: Item = Item {
-            id: storage.item_counter.read(),
+            id: storage.item_counter.try_read().unwrap(),
             price: price,
             owner: sender,
             metadata: metadata,
             total_bought: 0,
         };
         // save the new item to storage using the counter value
-        storage.item_map.insert(storage.item_counter.read(), new_item);
+        storage.item_map.insert(storage.item_counter.try_read().unwrap(), new_item);
     }
 
     #[storage(read, write), payable]
@@ -123,7 +123,7 @@ impl SwayStore for Contract {
 
     #[storage(read, write)]
     fn initialize_owner() -> Identity {
-        let owner = storage.owner.read();
+        let owner = storage.owner.try_read().unwrap();
         // make sure the owner has NOT already been initialized
         require(owner.is_none(), "owner already initialized");
         // get the identity of the sender
@@ -136,7 +136,7 @@ impl SwayStore for Contract {
 
     #[storage(read)]
     fn withdraw_funds() {
-        let owner = storage.owner.read();
+        let owner = storage.owner.try_read().unwrap();
         // make sure the owner has been initialized
         require(owner.is_some(), "owner not initialized");
         let sender = msg_sender().unwrap(); 
@@ -154,6 +154,6 @@ impl SwayStore for Contract {
 
     #[storage(read)]
     fn get_count() -> u64 {
-        storage.item_counter.read()
+        storage.item_counter.try_read().unwrap()
     }
 }

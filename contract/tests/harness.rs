@@ -18,10 +18,17 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
 
     let wallet = wallets.get(0).unwrap().clone();
 
-    let id = Contract::load_from("./out/debug/contract.bin", LoadConfiguration::default())
-    .unwrap()
-    .deploy(&wallet, TxParameters::default(),
+    let storage_config =
+    StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
+
+    let load_config = LoadConfiguration::default().set_storage_configuration(storage_config);
+
+    let id = Contract::load_from(
+        "./out/debug/contract.bin",
+        load_config,
     )
+    .unwrap()
+    .deploy(&wallet, TxParameters::default())
     .await
     .unwrap();
 
@@ -48,7 +55,7 @@ async fn can_set_owner() {
         .unwrap();
 
     // make sure the returned identity matches wallet_1
-    // assert!(Identity::Address(wallet_1.address().into()) == owner_result.value);
+    assert!(Identity::Address(wallet_1.address().into()) == owner_result.value);
 }
 
 #[tokio::test]
