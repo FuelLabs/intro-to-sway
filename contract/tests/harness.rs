@@ -21,7 +21,7 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
     let storage_config =
     StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
 
-    let load_config = LoadConfiguration::default().set_storage_configuration(storage_config);
+    let load_config = LoadConfiguration::default().with_storage_configuration(storage_config);
 
     let id = Contract::load_from(
         "./out/debug/contract.bin",
@@ -115,7 +115,7 @@ async fn can_list_and_buy_item() {
         .unwrap();
 
     // call params to send the project price in the buy_item fn
-    let call_params = CallParameters::default().set_amount(item_1_price);
+    let call_params = CallParameters::default().with_amount(item_1_price);
 
     // buy item 1 from wallet_2
     let _item_1_purchase = instance
@@ -194,7 +194,7 @@ async fn can_withdraw_funds() {
     assert_eq!(count.value, 1);
 
     // call params to send the project price in the buy_item fn
-    let call_params = CallParameters::default().set_amount(item_1_price);
+    let call_params = CallParameters::default().with_amount(item_1_price);
     
     // buy item 1 from wallet_3
     let item_1_purchase = instance
