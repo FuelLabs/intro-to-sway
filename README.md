@@ -1,16 +1,17 @@
-# Intro to Sway for JS Devs
+# Introduction to Sway Language for JavaScript Developers
 
-If you know JavaScript, you can quickly learn to build full-stack dapps, or decentralized applications, on Fuel with Sway. Once you learn some Sway fundamentals, you'll be ready to start building your own dapp.
+If you know JavaScript and basic blockchain fundamentals you can quickly learn to build full-stack decentralized applications, on Fuel with Sway. Once you learn some Sway fundamentals, you'll be ready to start building your own dapp.
 
-## TLDR
+Let's make a Sway contract for an online marketplace like Amazon where:  
 
-A Sway contract for a decentralized Amazon-like marketplace.
+1. Sellers can list products
+2. Buyers can buy products
 
-Make sure you have the Rust and Fuel toolchains installed. Install the beta-3 toolchain distribution and set it as your default.
+Part of what makes smart contracts so powerful is that they are immutable and permissionless. This means no single entity can change or alter the rules of the marketplace once it has been deployed. The deployer of the contract cannot suddenly change the state of the products that are listed within the contract. Likewise, if we hard-code a commission amount in the contract, no one can ever change the commission taken for products. 
 
-You can build the Sway contract with `forc build`.
+On top of this, anyone can interact with the contract. This means that anyone interact with the market place with their own custom frontend without permission, and contracts can interact with any number of frontends.
 
-To run the tests in `harness.rs`, use `cargo test`. To print to the console from the tests, use `cargo test -- --nocapture`.
+Within this tutorial we will be spcifically focused on `contracts` which is one of the [four programming types](https://docs.fuel.network/docs/sway/sway-program-types/) that are present in the Sway language. 
 
 ## What is Sway?
 
@@ -18,7 +19,7 @@ Sway is a strongly-typed programming language based on Rust used to write smart 
 
 Sway is backed by a powerful compiler and toolchain that work to abstract away complexities and ensure that your code is working, safe, and performant. 
 
-Part of what makes Sway so unique is the fantastic suite of tools surrounding it that help you turn a contract into a full-stack dapp:
+Part of what makes Sway so unique is the fantastic suite of tools surrounding it that help you turn a contract into a full-stack dapp which is all developed with each other in mind to help ensure the developer expereince is seemless and the best.
 
 - 📚 Sway Standard Library: A native library of helpful types and methods.
 
@@ -38,11 +39,11 @@ Before diving into any Sway code, ensure you have installed the following depend
 
 Start by installing the [Fuel toolchain](https://github.com/FuelLabs/fuelup).
 
-Install the beta-3 toolchain distribution and set it as your default with:
+Install the beta-4 toolchain distribution and set it as your default with:
 
 ```bash
-$ fuelup toolchain install beta-3
-$ fuelup default beta-3
+$ fuelup toolchain install beta-4
+$ fuelup default beta-4
 ```
 
 You can check to see the current toolchain version installed by running the following:
@@ -57,23 +58,16 @@ If you want to be able to run tests in Rust, install the [Rust toolchain](https:
 
 ## Writing a Contract
 
-> This example uses the `beta-3` toolchain, which is version `0.35.3` of `forc` and version `0.17.3` of `fuel-core`.
+> This example uses the `beta-4` toolchain, which is version `0.45.0` of `forc`
 
-Let's make a Sway contract for an online marketplace like Amazon, where sellers can list products, buyers can buy them, and the marketplace takes a cut of each purchase.
-
-Part of what makes smart contracts so powerful is that they are immutable and permissionless. This means that unless you build a function to remove an item or block certain users, no one will be able to delist any item or deny any users. Likewise, if we hard-code a commission amount in the contract, no one can ever change the commission taken for products. 
-
-On top of this, anyone can interact with the contract. This means that anyone can make a frontend for your contract without permission, and contracts can interact with any number of frontends.
-
-We can start by creating a new folder called `sway-store`, and making a new contract called `sway-store-contract`. 
+Within your terminal start by creating a new folder called `sway-store`, and making a new contract called `sway-store-contract`. 
 
 ```bash
-$ mkdir sway-store
+$ forc new sway-store
 $ cd sway-store
-$ forc new contract
 ```
 
-Open up the `contract` folder in VS Code, and inside the `src` folder you should see a file called `main.sw`. This is where you will write your Sway contract. You can delete everything in this file.
+Open up the `contract` folder in VSCode, and inside the `src` folder you should see a file called `main.sw`. This is where you will write your Sway contract. Since we're creating a brand new contract you can delete everything in this file.
 
 The first line of the file is specially reserved to let the compiler know if we are writing a contract, script, predicate, or library. To define the file as a contract, use the `contract` keyword.
 
@@ -116,11 +110,11 @@ use std::{
 
 We'll go through what each of these imports does as we use them later.
 
-### Item Struct
+### Defining Item Struct
 
-Struct is short for structure, which is a data structure similar to an object in JavaScript. You define a struct with the `struct` keyword and define the fields of a struct inside curly brackets.
+Struct is short for structure, which is a data structure similar to an object in JavaScript. You define a struct with the `struct` keyword in Sway and define the fields of a struct inside curly brackets.
 
-The core of our program is the ability to list, sell, and get `items`.
+The core of our program is the ability to list, sell, and get `Items`.
 
 Let's define the `Item` type as shown below:
 
@@ -129,7 +123,7 @@ struct Item {
     id: u64,
     price: u64,
     owner: Identity,
-    metadata: str[20],
+    metadata: String,
     total_bought: u64,
 }
 ```
@@ -138,7 +132,7 @@ The item struct will hold an ID, price, the owner's identity, a string for a URL
 
 #### Types
 
-The `Item` struct uses three types: `u64`, `str[20]`, and `Identity`.
+The `Item` struct uses three types: `u64`, `String`, and `Identity`.
 
 `u64`: a 64-bit unsigned integer
 
@@ -152,11 +146,11 @@ An unsigned integer means there is no `+` or `-` sign, so the value is always po
 
 In JavaScript, there are two types of integers: a number and a BigInt. The main difference between these types is that BigInt can store a much larger value. Similarly, each number type for Sway has different values for the largest number that can be stored.
 
-`str[20]`: a string with exactly 20 characters. All strings in Sway must have a fixed length. 
+`String`: a string with created from the string in the standard library. If you want to use the `str` keyword you must define a fixed length and cannot be changed. 
 
-`Identity`: an enum type that represents either a user's `Address` or a `ContractId`. We already imported this type from the standard library earlier.
+`Identity`: an enum type that represents either a user's `Address` or a `ContractId`. We already imported this type from the standard library earlier. To a contract or and EOA (Externally owned account) which are two clearly differentiated in Sway. Which are both just typesafe wrapped b256.
 
-### ABI
+### Defining The ABI
 
 Next, we will define our ABI. ABI stands for application binary interface. In a Sway contract, it's an outline of all of the functions in the contract. For each function, you must specify its name, input types, return types, and level of storage access. 
 
@@ -167,7 +161,7 @@ abi SwayStore {
     // a function to list an item for sale
     // takes the price and metadata as args
     #[storage(read, write)]
-    fn list_item(price: u64, metadata: str[20]);
+    fn list_item(price: u64, metadata: String);
 
     // a function to buy an item
     // takes the item id as the arg
@@ -202,7 +196,7 @@ If any function reads from or writes to storage, you must define that level of a
 
 If you expect funds to be sent when a function is called, like the `buy_item` function, you must use the `#[payable]` annotation.
 
-### Storage Block
+### Defining The Storage Block
 
 Next, we can add the storage block. The storage block is where you can store any state variables in your contract that you want to be persistent. Any Sway primitive type can be stored in the storage block.
 
@@ -243,7 +237,7 @@ owner: Option<Identity> = Option::None
 
 If you want a value to be null or undefined under certain conditions, you can use an `Option` type, which is an enum that can be either `Some(value)` or `None`. The keyword `None` represents that no value exists, while the keyword `Some` means there is some value stored.
 
-### Error Handling
+### Defining Error Handling
 
 Enumerations, or enums, are a type that can be one of several variations. In our contract, we can use an enum to create custom errors to handle errors in a function. 
 
@@ -262,7 +256,7 @@ In our contract, we can expect there to be some different situations where we wa
 
 We can define the return types for each error. For the `IncorrectAssetId` error we can return the asset id sent, which is a `ContractId` type. For the `NotEnoughTokens` variation, we can return the number of coins by defining the return type as a `u64`. For the `OnlyOwner` Error, we can use the Identity of the message sender. 
 
-### Contract Functions
+### Defining The Contract Functions
 
 Finally, we can write our contract functions. Copy and paste the ABI from earlier. The functions in the contract *must* match the ABI, or the compiler will throw an error. Replace the semicolons at the end of each function with curly brackets, and change `abi SwayStore` to `impl SwayStore for Contract` as shown below:
 
@@ -308,28 +302,28 @@ Our first function allows sellers to list an item for sale. They can set the ite
 #[storage(read, write)]
 fn list_item(price: u64, metadata: str[20]) {
     // increment the item counter
-    storage.item_counter += 1;
+    storage.item_counter.write(storage.item_counter.try_read().unwrap() + 1);
     //  get the message sender
     let sender = msg_sender().unwrap();
     // configure the item
     let new_item: Item = Item {
-        id: storage.item_counter,
+        id: storage.item_counter.try_read().unwrap(),
         price: price,
         owner: sender,
         metadata: metadata,
         total_bought: 0,
     };
     // save the new item to storage using the counter value
-    storage.item_map.insert(storage.item_counter, new_item);
+    storage.item_map.insert(storage.item_counter.try_read().unwrap(), new_item);
 }
 ```
 
 #### Updating storage
 
-The first step is incrementing the `item_counter` from storage so we can use it as the item's ID. 
+The first step is incrementing the `item_counter` from storage so we can use it as the item's ID. In Sway the standard library has `read()`, `write()`, and `try_read()` methods to access or manipulate contract storage. Use try_read() when possible to avoid potential issues with accessing uninitialized storage. Here we are reading the current number of items that are already listed, modifying it, then writing it back into storage. 
 
 ```rust
-storage.item_counter += 1;
+storage.item_counter.write(storage.item_counter.try_read().unwrap() + 1);
 ```
 
 #### Getting the message sender
@@ -338,7 +332,7 @@ Next, we can get the `Identity` of the account listing the item.
 
 To define a variable in Sway, you can use `let` or `const`. Types must be declared where they cannot be inferred by the compiler.
 
-To get the `Identity`, you can use the `msg_sender` function imported from the standard library. This function returns a `Result`, which is an enum type that is either OK or an error. The `Result` type is used when a value that could potentially be an error is expected.
+To get the `Identity`, you can use the `msg_sender` function imported from the standard library. `msg_sender` refers to the address of the entity (could be a user address or another contract address) that started the current function call. This function returns a `Result`, which is an enum type that is either OK or an error. The `Result` type is used when a value that could potentially be an error is expected.
 
 ```rust
 enum Result<T, E> {
@@ -363,7 +357,7 @@ Because the `owner` field requires a type `Identity`, you can use the sender val
 
 ```rust
 let new_item: Item = Item {
-    id: storage.item_counter,
+    id: storage.item_counter.try_read().unwrap(),
     price: price,
     owner: sender,
     metadata: metadata,
@@ -376,16 +370,16 @@ let new_item: Item = Item {
 Finally, you can add the item to the `item_map` in the storage using the `insert` method. You can use the same ID for the key and set the item as the value.
 
 ```rust
-storage.item_map.insert(storage.item_counter, new_item);
+storage.item_map.insert(storage.item_counter.try_read().unwrap(), new_item);
 ```
 
 ### Buying an item
 
 Next, we want buyers to be able to buy an item that has been listed, which means we will need to:
-- accept the item ID as a function parameter
-- make sure the buyer is paying the right price and using the right coins
-- increment the `total_bought` count for the item
-- transfer the cost of the item to the seller minus some fee that the contract will keep
+1. Accept the item ID the buyer wants as a function parameter
+2. Make sure the buyer is paying the right price and using valid coins
+3. Increment the `total_bought` count for the item
+4. Transfer the cost of the item to the seller minus some fee that the contract will keep
 
 ```rust
 #[storage(read, write), payable]
@@ -399,7 +393,7 @@ fn buy_item(item_id: u64) {
     let amount = msg_amount();
 
     // get the item to buy
-    let mut item = storage.item_map.get(item_id).unwrap();
+    let mut item = storage.item_map.get(item_id).try_read().unwrap();
 
     // require that the amount is at least the price of the item
     require(amount >= item.price, InvalidError::NotEnoughTokens(amount));
@@ -415,10 +409,10 @@ fn buy_item(item_id: u64) {
         let commission = amount / 20;
         let new_amount = amount - commission;
         // send the payout minus commission to the seller
-        transfer(new_amount, asset_id, item.owner);
+        transfer(item.owner, asset_id, new_amount);
     } else {
         // send the full payout to the seller
-        transfer(amount, asset_id, item.owner);
+        transfer(item.owner, asset_id, amount);
     }
 }
 ```
@@ -443,7 +437,7 @@ If the asset is any different, or, for example, someone tries to buy an item wit
 require(asset_id == BASE_ASSET_ID, InvalidError::IncorrectAssetId(asset_id));
 ```
 
-Next, we can use the `msg_amount` function from the standard library to get the number of coins sent from the buyer.
+Next, we can use the `msg_amount` function from the standard library to get the number of coins sent from the buyer along side the transaction.
 
 ```rust
 let amount = msg_amount();
@@ -451,10 +445,10 @@ let amount = msg_amount();
 
 To check that this amount isn't less than the item's price, we need to look up the item details using the `item_id` parameter.
 
-To get a value for a particular key in a storage map, we can use the `get` method and pass in the key value. This method returns a `Result` type, so we can use the `unwrap` method here to access the item value. 
+To get a value for a particular key in a storage map, we can use the `get` method and pass in the key value. We access the mapping storage using `try_read()`. This method returns a `Result` type, so we can use the `unwrap` method here to access the item value. 
 
 ```rust
-let mut item = storage.item_map.get(item_id).unwrap();
+let mut item = storage.item_map.get(item_id).try_read().unwrap();
 ```
 
 By default, all variables are immutable in Sway for both `let` and `const`. However, if you want to change the value of any variable, you have to declare it as mutable with the `mut` keyword. Because we'll update the item's `total_bought` value later, we need to define it as mutable.
@@ -464,6 +458,7 @@ We also want to require that the number of coins sent to buy the item isn't less
 ```rust
 require(amount >= item.price, InvalidError::NotEnoughTokens(amount));
 ```
+
 #### Updating storage
 
 We can increment the value for the item's `total_bought` field and then re-insert it into the `item_map`. This will overwrite the previous value with the updated item.
@@ -477,19 +472,19 @@ storage.item_map.insert(item_id, item);
 
 Finally, we can transfer the payment to the seller. It's always best to transfer assets after all storage updates have been made to avoid [re-entrancy attacks](https://fuellabs.github.io/sway/v0.32.1/book/blockchain-development/calling_contracts.html).
 
-We can subtract a fee for items that meet a certain price threshold using a conditional `if` statement. `if` statements in Sway don't use parentheses around the conditions, but otherwise look the same as in JavaScript.
+We can subtract a fee for items that meet a certain price threshold using a conditional `if` statement. `if` statements in Sway look the same as in JavaScript.
 
 ```rust
-if amount > 100_000_000 {
+if (amount > 100_000_000) {
     let commission = amount / 20;
     let new_amount = amount - commission;
-    transfer(new_amount, asset_id, item.owner);
+   transfer(item.owner, asset_id, new_amount);
 } else {
-    transfer(amount, asset_id, item.owner);
+    transfer(item.owner, asset_id, amount);
 }
 ```
 
-In the if-condition above, we check if the amount sent exceeds 100,000,000. To visually separate a large number like `100000000`, we can use an underscore, like `100_000_000`. If the base asset for this contract is ETH, this would be equal to 0.1 ETH. 
+In the if-condition above, we check if the amount sent exceeds 100,000,000. To visually separate a large number like `100000000`, we can use an underscore, like `100_000_000`. If the base asset for this contract is ETH, this would be equal to 0.1 ETH because Fuel uses a 9 decimal system. 
 
 If the amount exceeds 0.1 ETH, we calculate a commission and subtract that from the amount.
 
@@ -500,21 +495,22 @@ We can use the `transfer` function to send the amount to the item owner. The `tr
 To get the details for an item, we can create a read-only function that returns the `Item` struct for a given item ID.
 
 ```rust
- #[storage(read)]
+#[storage(read)]
 fn get_item(item_id: u64) -> Item {
-    storage.item_map.get(item_id).unwrap()
+    // returns the item for the given item_id
+    storage.item_map.get(item_id).try_read().unwrap()
 }
 ```
 
-To return a value in a function, you can either use the `return` keyword just as you would in JavaScript or omit the semicolon in the last line to return that line.
+To return a value in a function, you can either use the `return` keyword just as you would in JavaScript or omit the semicolon in the last line to return that line. Althought both work it is always good to be more explicit.
 
 ```rust
 fn my_function(num: u64) -> u64{
     // returning the num variable
-    num
+    return num;
     
     // this would also work:
-    // return num;
+    num;
 }
 ```
 
@@ -525,22 +521,24 @@ To make sure we are setting the owner `Identity` correctly, instead of hard-codi
 ```rust
 #[storage(read, write)]
 fn initialize_owner() -> Identity {
-    let owner = storage.owner;
+    let owner = storage.owner.try_read().unwrap();
     // make sure the owner has NOT already been initialized
     require(owner.is_none(), "owner already initialized");
     // get the identity of the sender
     let sender = msg_sender().unwrap(); 
     // set the owner to the sender's identity
-    storage.owner = Option::Some(sender);
+    storage.owner.write(Option::Some(sender));
     // return the owner
-    sender
+    return sender
 }
 ```
 
 Because we only want to be able to call this function once (right after the contract is deployed), we'll require that the owner value still needs be `None`. To do that, we can use the `is_none` method, which checks if an Option type is `None`. 
 
+Be aware that [front running](https://scsfg.io/hackers/frontrunning/) is a possibility here. 
+
 ```rust
-let owner = storage.owner;
+let owner = storage.owner.try_read().unwrap();
 require(owner.is_none(), "owner already initialized");
 ```
 
@@ -548,13 +546,13 @@ To set the `owner` as the message sender, we'll need to convert the `Result` typ
 
 ```rust
 let sender = msg_sender().unwrap(); 
-storage.owner = Option::Some(sender);
+storage.owner.write(Option::Some(sender));
 ```
 
 Last, we'll return the message sender's `Identity`.
 
 ```rust
-sender
+return sender
 ```
 
 ### Withdraw funds
@@ -562,9 +560,8 @@ sender
 The `withdraw_funds` function allows the owner to withdraw the funds that the contract has accrued.
 
 ```rust
-#[storage(read)]
 fn withdraw_funds() {
-    let owner = storage.owner;
+    let owner = storage.owner.try_read().unwrap();
     // make sure the owner has been initialized
     require(owner.is_some(), "owner not initialized");
     let sender = msg_sender().unwrap(); 
@@ -577,21 +574,21 @@ fn withdraw_funds() {
     // require the contract balance to be more than 0
     require(amount > 0, InvalidError::NotEnoughTokens(amount));
     // send the amount to the owner
-    transfer(amount, BASE_ASSET_ID, owner.unwrap());
+    transfer(owner.unwrap(), BASE_ASSET_ID, amount);
 }
 ```
 
 First, we'll ensure that the owner has been initalized to some address.
 
 ```rust
-let owner = storage.owner;
-require(owner.is_some(), InvalidError::OwnerNotInitialized);
+let owner = storage.owner.try_read().unwrap();
+require(owner.is_some(), "owner not initialized");
 ```
 
 Next, we will require that the person trying to withdraw the funds is the owner.
 
 ```rust
-let sender = msg_sender().unwrap();  
+let sender = msg_sender().unwrap(); 
 require(sender == owner.unwrap(), InvalidError::OnlyOwner(sender));
 ```
 
@@ -605,7 +602,7 @@ require(amount > 0, InvalidError::NotEnoughTokens(amount));
 Finally, we will transfer the balance of the contract to the owner.
 
 ```rust
-transfer(amount, BASE_ASSET_ID, owner.unwrap());
+transfer(owner.unwrap(), BASE_ASSET_ID, amount);
 ```
 
 ### Get the project count
@@ -615,15 +612,17 @@ The last function we need to add is the `get_count` function, which is a simple 
 ```rust
 #[storage(read)]
 fn get_count() -> u64 {
-    storage.item_counter
+    return storage.item_counter.try_read().unwrap()
 }
 ```
 
 ### Building the contract
 
+To format your contract, run `forc fmt`.
+
 You can compile your contract by running `forc build` in the contract folder. And that's it! You just wrote an entire contract in Sway 💪🛠🔥🚀🎉😎🌴✨.
 
-To format your contract, run `forc fmt`.
+### Checkpoint
 
 ## Testing the contract
 
