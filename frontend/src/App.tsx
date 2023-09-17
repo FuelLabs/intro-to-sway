@@ -55,7 +55,7 @@ function App() {
           ) : (
             <div>
               <button onClick={() => fuel.connect()}>Connect Wallet</button>
-            </div>
+          </div>
           )}
         </div>
       ) : (

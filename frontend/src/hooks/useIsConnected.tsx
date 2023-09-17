@@ -22,5 +22,6 @@ export function useIsConnected() {
     };
   }, [fuel]);
 
+  console.log(isConnected)
   return [isConnected];
 }
