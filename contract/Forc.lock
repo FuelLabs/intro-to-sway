@@ -1,13 +1,13 @@
 [[package]]
-name = 'contract'
-source = 'member'
-dependencies = ['std']
+name = "contract"
+source = "member"
+dependencies = ["std"]
 
 [[package]]
-name = 'core'
-source = 'path+from-root-140ABAC4C486046F'
+name = "core"
+source = "path+from-root-AD80769CAE44474A"
 
 [[package]]
-name = 'std'
-source = 'git+https://github.com/fuellabs/sway?tag=v0.44.0#241d30f7cde5cdd1f378eb2bc1daae945f329d0c'
-dependencies = ['core']
+name = "std"
+source = "git+https://github.com/fuellabs/sway?tag=v0.46.0#e75f14b03636bc96751a6760304a1a6d3eb5937d"
+dependencies = ["core"]

@@ -229,9 +229,6 @@ async fn can_withdraw_funds() {
         .await;
     assert!(withdraw.is_ok());
 
-     // Bytes representation of the asset ID of the "base" asset used for gas fees.
-     const BASE_ASSET_ID: AssetId = AssetId::new([0u8; 32]);
-
     // check the balances of wallet_1 and wallet_2
     let balance_1: u64 = wallet_1.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
     let balance_2: u64 = wallet_2.get_asset_balance(&BASE_ASSET_ID).await.unwrap();

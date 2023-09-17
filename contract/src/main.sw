@@ -9,6 +9,7 @@ use std::{
         this_balance,
     },
     token::transfer,
+    hash::Hash,
 };
 
 struct Item {
