@@ -18,14 +18,14 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
 
     let wallet = wallets.get(0).unwrap().clone();
 
-    let storage_config =
-    StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
+    // let storage_config =
+    // StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
 
-    let load_config = LoadConfiguration::default().with_storage_configuration(storage_config);
+    // let load_config = LoadConfiguration::default().with_storage_configuration(storage_config);
 
     let id = Contract::load_from(
         "./out/debug/contract.bin",
-        load_config,
+        LoadConfiguration::default(),
     )
     .unwrap()
     .deploy(&wallet, TxParameters::default())
