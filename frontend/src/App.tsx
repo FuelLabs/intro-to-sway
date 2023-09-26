@@ -47,16 +47,16 @@ function App() {
 
       {fuel ? (
         <div>
-          {/* {isConnected ? ( */}
-            {/* <div> */}
+          {isConnected ? (
+            <div>
               {active === 'all-items' && <AllItems contract={contract} />}
               {active === 'list-item' && <ListItem contract={contract} />}
-            {/* </div>
+            </div>
           ) : (
             <div>
               <button onClick={() => fuel.connect()}>Connect Wallet</button>
           </div>
-          )} */}
+          )}
         </div>
       ) : (
         <div>
