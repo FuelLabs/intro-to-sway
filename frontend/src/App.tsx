@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useWindowFuel } from '@fuel-wallet/react';
+import { Fuel } from '@fuel-wallet/sdk';
 import { WalletLocked } from "fuels";
 import { ContractAbi__factory } from "./contracts"
 import AllItems from "./components/AllItems";
@@ -12,29 +12,27 @@ function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
   const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
   const [isConnected, setIsConnected] = useState(false);
-  const windowFuel = useWindowFuel();
-
+  const fuel = useMemo(() => new Fuel(), []);
 
   useEffect(() => {
     async function getAccounts() {
-      const currentAccount = await windowFuel!.currentAccount();
-      const tempWallet = await windowFuel?.getWallet(currentAccount)
+      const currentAccount = await fuel.currentAccount();
+      const tempWallet = await fuel.getWallet(currentAccount)
       setWallet(tempWallet)
 
-      const connected = await windowFuel!.isConnected()
+      const connected = await fuel.isConnected()
       setIsConnected(connected);
     }
-    if (windowFuel) getAccounts();
-  }, [windowFuel]);
+    if (fuel) getAccounts();
+  }, [fuel]);
 
   const contract = useMemo(() => {
-    if (windowFuel && wallet) {
+    if (fuel && wallet) {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
     }
     return null;
-  }, [windowFuel, wallet]);
-
+  }, [fuel, wallet]);
 
   return (
     <div className="App">
@@ -48,7 +46,7 @@ function App() {
         </ul>
       </nav>
 
-      {windowFuel ? (
+      {fuel ? (
         <div>
           { isConnected ? (
             <div>
@@ -57,7 +55,7 @@ function App() {
             </div>
           ) : (
             <div>
-              <button onClick={() => windowFuel?.connect()}>Connect Wallet</button>
+              <button onClick={() => fuel.connect()}>Connect Wallet</button>
           </div>
           )}
         </div>
