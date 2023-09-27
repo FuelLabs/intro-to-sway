@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useIsConnected } from "./hooks/useIsConnected";
-import { useFuel } from "./hooks/useFuel";
+import { useWindowFuel } from '@fuel-wallet/react';
 import { WalletLocked } from "fuels";
 import { ContractAbi__factory } from "./contracts"
 import AllItems from "./components/AllItems";
@@ -11,26 +10,30 @@ const CONTRACT_ID = "0xe924cde59c8b07fe4155f484038cdab8a027e3549eda80022c7c515a4
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
-  const [isConnected] = useIsConnected();
-  const [fuel] = useFuel();
   const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
+  const [isConnected, setIsConnected] = useState(false);
+  const windowFuel = useWindowFuel();
+
 
   useEffect(() => {
     async function getAccounts() {
-      const currentAccount = await fuel.currentAccount();
-      const tempWallet = await fuel.getWallet(currentAccount)
+      const currentAccount = await windowFuel!.currentAccount();
+      const tempWallet = await windowFuel?.getWallet(currentAccount)
       setWallet(tempWallet)
+
+      const connected = await windowFuel!.isConnected()
+      setIsConnected(connected);
     }
-    if (fuel) getAccounts();
-  }, [fuel]);
+    if (windowFuel) getAccounts();
+  }, [windowFuel]);
 
   const contract = useMemo(() => {
-    if (fuel && wallet) {
+    if (windowFuel && wallet) {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
     }
     return null;
-  }, [fuel, wallet]);
+  }, [windowFuel, wallet]);
 
 
   return (
@@ -45,16 +48,16 @@ function App() {
         </ul>
       </nav>
 
-      {fuel ? (
+      {windowFuel ? (
         <div>
-          {isConnected ? (
+          { isConnected ? (
             <div>
               {active === 'all-items' && <AllItems contract={contract} />}
               {active === 'list-item' && <ListItem contract={contract} />}
             </div>
           ) : (
             <div>
-              <button onClick={() => fuel.connect()}>Connect Wallet</button>
+              <button onClick={() => windowFuel?.connect()}>Connect Wallet</button>
           </div>
           )}
         </div>
