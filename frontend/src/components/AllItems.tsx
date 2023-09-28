@@ -16,13 +16,13 @@ export default function AllItems({ contract }: AllItemsProps) {
     async function getAllItems() {
       if (contract !== null) {
         try {
-          let { value } = await contract.functions.get_count().get();
+          let { value } = await contract.functions.get_count().simulate();
           let formattedValue = parseFloat(value.format()) * 1_000_000_000;
           setItemCount(formattedValue);
           let max = formattedValue + 1;
           let tempItems = [];
           for(let i=1; i < max; i++){
-            let resp = await contract.functions.get_item(i).get();
+            let resp = await contract.functions.get_item(i).simulate();
             tempItems.push(resp.value)
           }
           setItems(tempItems)

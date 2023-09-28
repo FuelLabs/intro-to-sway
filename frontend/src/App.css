@@ -39,6 +39,7 @@ nav > ul > li {
 
 .items-container{
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 2rem;
   margin: 1rem 0;

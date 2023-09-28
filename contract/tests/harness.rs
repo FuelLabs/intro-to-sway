@@ -1,4 +1,4 @@
-use fuels::{prelude::*, tx::AssetId, tx::ContractId, types::{Identity, SizedAsciiString}};
+use fuels::{prelude::*, types::{Identity, SizedAsciiString}};
 
 // Load abi from json
 abigen!(Contract(name="SwayStore", abi="out/debug/contract-abi.json"));
@@ -18,11 +18,17 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
 
     let wallet = wallets.get(0).unwrap().clone();
 
-    let id = Contract::deploy(
+    // let storage_config =
+    // StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
+
+    // let load_config = LoadConfiguration::default().with_storage_configuration(storage_config);
+
+    let id = Contract::load_from(
         "./out/debug/contract.bin",
-        &wallet,
-        DeployConfiguration::default(),
+        LoadConfiguration::default(),
     )
+    .unwrap()
+    .deploy(&wallet, TxParameters::default())
     .await
     .unwrap();
 
@@ -109,7 +115,7 @@ async fn can_list_and_buy_item() {
         .unwrap();
 
     // call params to send the project price in the buy_item fn
-    let call_params = CallParameters::default().set_amount(item_1_price);
+    let call_params = CallParameters::default().with_amount(item_1_price);
 
     // buy item 1 from wallet_2
     let _item_1_purchase = instance
@@ -188,7 +194,7 @@ async fn can_withdraw_funds() {
     assert_eq!(count.value, 1);
 
     // call params to send the project price in the buy_item fn
-    let call_params = CallParameters::default().set_amount(item_1_price);
+    let call_params = CallParameters::default().with_amount(item_1_price);
     
     // buy item 1 from wallet_3
     let item_1_purchase = instance
@@ -222,9 +228,6 @@ async fn can_withdraw_funds() {
         .call()
         .await;
     assert!(withdraw.is_ok());
-
-     // Bytes representation of the asset ID of the "base" asset used for gas fees.
-     const BASE_ASSET_ID: AssetId = AssetId::new([0u8; 32]);
 
     // check the balances of wallet_1 and wallet_2
     let balance_1: u64 = wallet_1.get_asset_balance(&BASE_ASSET_ID).await.unwrap();

@@ -6,7 +6,6 @@
       "dom.iterable",
       "esnext"
     ],
-    "types": ["@fuel-wallet/sdk"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
