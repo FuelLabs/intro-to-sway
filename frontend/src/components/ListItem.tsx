@@ -1,16 +1,24 @@
+// ANCHOR: fe_list_items_import
 import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { bn } from "fuels";
+// ANCHOR_END: fe_list_items_import
 
+// ANCHOR: fe_list_items_interface
 interface ListItemsProps {
   contract: ContractAbi | null;
 }
+// ANCHOR_END: fe_list_items_interface
 
+// ANCHOR: fe_list_items_function
 export default function ListItem({contract}: ListItemsProps){
+// ANCHOR_END: fe_list_items_function
+    // ANCHOR: fe_list_items_state_variables
     const [metadata, setMetadata] = useState<string>("");
     const [price, setPrice] = useState<string>("0");
     const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
-
+    // ANCHOR_END: fe_list_items_state_variables
+    // ANCHOR: fe_list_items_handle_submit
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>){
         e.preventDefault();
         setStatus('loading')
@@ -27,10 +35,12 @@ export default function ListItem({contract}: ListItemsProps){
             console.log("ERROR: Contract is null");
         }
     }
+    // ANCHOR_END: fe_list_items_handle_submit
     
     return (
         <div>
             <h2>List an Item</h2>
+            {/* ANCHOR: fe_list_items_form */}
             {status === 'none' &&
             <form onSubmit={handleSubmit}>
                 <div className="form-control">
@@ -70,6 +80,7 @@ export default function ListItem({contract}: ListItemsProps){
             {status === 'success' && <div>Item successfully listed!</div>}
             {status === 'error' && <div>Error listing item. Please try again.</div>}
             {status === 'loading' && <div>Listing item...</div>}
+            {/* ANCHOR_END: fe_list_items_form */}
         </div>
     )
 }

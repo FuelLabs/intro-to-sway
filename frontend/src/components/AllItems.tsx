@@ -1,3 +1,4 @@
+// ANCHOR: fe_all_items_template
 import { useState, useEffect } from "react";
 import { ContractAbi } from "../contracts";
 import { ItemOutput } from "../contracts/ContractAbi";
@@ -8,10 +9,13 @@ interface AllItemsProps {
 }
 
 export default function AllItems({ contract }: AllItemsProps) {
+  // ANCHOR_END: fe_all_items_template
+  // ANCHOR: fe_all_items_state_variables
   const [items, setItems] = useState<ItemOutput[]>([]);
   const [itemCount, setItemCount] = useState<number>(0);
   const [status, setStatus] = useState<'success' | 'loading' | 'error'>('loading');
-
+  // ANCHOR_END: fe_all_items_state_variables
+  // ANCHOR: fe_all_items_use_effect
   useEffect(() => {
     async function getAllItems() {
       if (contract !== null) {
@@ -35,10 +39,11 @@ export default function AllItems({ contract }: AllItemsProps) {
     }
     getAllItems();
   }, [contract]);
-
+  // ANCHOR_END: fe_all_items_use_effect
   return (
     <div>
       <h2>All Items</h2>
+      {/* ANCHOR: fe_all_items_cards */}
       {status === 'success' &&
         <div>
           {itemCount === 0 ? (
@@ -57,6 +62,7 @@ export default function AllItems({ contract }: AllItemsProps) {
       }
       {status === 'error' && <div>Something went wrong, try reloading the page.</div>}
       {status === 'loading' && <div>Loading...</div>}
+      {/* ANCHOR_END: fe_all_items_cards */}
     </div>
   );
 }

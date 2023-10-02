@@ -1,8 +1,11 @@
+// ANCHOR: rs_import
 use fuels::{prelude::*, types::{Identity, SizedAsciiString}};
+// ANCHOR_END: rs_import
 
 // Load abi from json
 abigen!(Contract(name="SwayStore", abi="out/debug/contract-abi.json"));
 
+// ANCHOR: rs_contract_instance_parent
 async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<WalletUnlocked>) {
     // Launch a local network and deploy the contract
     let wallets = launch_custom_provider_and_get_wallets(
@@ -17,12 +20,8 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
     .await;
 
     let wallet = wallets.get(0).unwrap().clone();
-
-    // let storage_config =
-    // StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
-
-    // let load_config = LoadConfiguration::default().with_storage_configuration(storage_config);
-
+    
+    // ANCHOR: rs_contract_instance_config
     let id = Contract::load_from(
         "./out/debug/contract.bin",
         LoadConfiguration::default(),
@@ -31,12 +30,15 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
     .deploy(&wallet, TxParameters::default())
     .await
     .unwrap();
+    // ANCHOR_END: rs_contract_instance_config
 
     let instance = SwayStore::new(id.clone(), wallet);
 
     (instance, id.into(), wallets)
 }
+// ANCHOR_END: rs_contract_instance_parent
 
+// ANCHOR: rs_test_set_owner
 #[tokio::test]
 async fn can_set_owner() {
     let (instance, _id, wallets) = get_contract_instance().await;
@@ -57,7 +59,9 @@ async fn can_set_owner() {
     // make sure the returned identity matches wallet_1
     assert!(Identity::Address(wallet_1.address().into()) == owner_result.value);
 }
+// ANCHOR_END: rs_test_set_owner
 
+// ANCHOR: rs_test_set_owner_once
 #[tokio::test]
 #[should_panic]
 async fn can_set_owner_only_once() {
@@ -88,7 +92,9 @@ async fn can_set_owner_only_once() {
         .await
         .unwrap();
 }
+// ANCHOR_END: rs_test_set_owner_once
 
+// ANCHOR: rs_test_list_and_buy_item
 #[tokio::test]
 async fn can_list_and_buy_item() {
     let (instance, _id, wallets) = get_contract_instance().await;
@@ -144,7 +150,9 @@ async fn can_list_and_buy_item() {
     assert!(item_1.value.id == 1);
     assert!(item_1.value.total_bought == 1);
 }
+// ANCHOR_END: rs_test_list_and_buy_item
 
+// ANCHOR: rs_test_withdraw_funds
 #[tokio::test]
 async fn can_withdraw_funds() {
     let (instance, _id, wallets) = get_contract_instance().await;
@@ -241,3 +249,4 @@ async fn can_withdraw_funds() {
     // println!("BALANCE 3: {:?}", balance_3);
     assert!(balance_3 == 850000000);
 }
+// ANCHOR_END: rs_test_withdraw_funds
