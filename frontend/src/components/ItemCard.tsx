@@ -1,3 +1,4 @@
+/* ANCHOR: fe_item_card_all */
 // ANCHOR: fe_item_card_template
 import { useState } from "react";
 import { ItemOutput } from "../contracts/ContractAbi";
@@ -49,3 +50,4 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
     // ANCHOR_END: fe_item_cards
   );
 }
+/* ANCHOR_END: fe_item_card_all */

@@ -1,3 +1,4 @@
+/* ANCHOR: fe_app_all */
 // ANCHOR: fe_app_template
 import { useState, useMemo } from "react";
 // ANCHOR: fe_import_hooks
@@ -98,3 +99,4 @@ function App() {
 }
 
 export default App;
+/* ANCHOR_END: fe_app_all */

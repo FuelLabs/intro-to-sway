@@ -1,3 +1,4 @@
+/* ANCHOR: fe_list_items_all */
 // ANCHOR: fe_list_items_import
 import { useState } from "react";
 import { ContractAbi } from "../contracts";
@@ -84,3 +85,4 @@ export default function ListItem({contract}: ListItemsProps){
         </div>
     )
 }
+/* ANCHOR_END: fe_list_items_all */

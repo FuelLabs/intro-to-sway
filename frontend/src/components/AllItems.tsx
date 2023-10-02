@@ -1,3 +1,4 @@
+/* ANCHOR: fe_all_items_all */
 // ANCHOR: fe_all_items_template
 import { useState, useEffect } from "react";
 import { ContractAbi } from "../contracts";
@@ -66,3 +67,4 @@ export default function AllItems({ contract }: AllItemsProps) {
     </div>
   );
 }
+/* ANCHOR_END: fe_all_items_all */
