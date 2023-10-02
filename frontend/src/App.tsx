@@ -1,3 +1,4 @@
+// ANCHOR: fe_app_template
 import { useState, useMemo } from "react";
 // ANCHOR: fe_import_hooks
 import { useFuel, useIsConnected, useAccount, useWallet } from '@fuel-wallet/react';
@@ -12,6 +13,7 @@ const CONTRACT_ID = "0xe924cde59c8b07fe4155f484038cdab8a027e3549eda80022c7c515a4
 // ANCHOR_END: fe_contract_id
 
 function App() {
+// ANCHOR_END: fe_app_template
   // ANCHOR: fe_state_active
   const [active, setActive] = useState<'all-items' | 'list-item'>('all-items');
   // ANCHOR_END: fe_state_active
@@ -19,9 +21,12 @@ function App() {
   const fuelObj = useFuel();
   const isConnectedObj = useIsConnected();
   const accountObj = useAccount();
+  // ANCHOR: fe_wallet
   const walletObj = useWallet({ address: accountObj.account });
+  // ANCHOR_END: fe_wallet
   // ANCHOR_END: fe_call_hooks
   
+  // ANCHOR: fe_use_memo
   const contract = useMemo(() => {
     if (walletObj.wallet) {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, walletObj.wallet);
@@ -29,6 +34,7 @@ function App() {
     }
     return null;
   }, [walletObj]);
+  // ANCHOR_END: fe_use_memo
 
   return (
     <div className="App">
@@ -58,11 +64,13 @@ function App() {
         <div>
           { isConnectedObj.isConnected ? (
             <div>
+              {/* ANCHOR: fe_items_contract */}
               {/* ANCHOR: fe_all_items_contract */}
               {active === 'all-items' && <AllItems contract={contract} />}
               {/* ANCHOR_END: fe_all_items_contract */}
               {active === 'list-item' && <ListItem contract={contract} />}
-            </div>
+              {/* ANCHOR_END: fe_items_contract */}
+              </div>
           ) : (
             <div>
               <button onClick={() => fuelObj.fuel?.connect()}>
