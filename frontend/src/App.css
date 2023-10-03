@@ -1,3 +1,4 @@
+/* ANCHOR: fe_css */
 .App {
   text-align: center;
 }
@@ -69,3 +70,4 @@ button {
   font-size: 20px;
   color: white;
 }
+/* ANCHOR_END: fe_css */

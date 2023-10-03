@@ -1,3 +1,5 @@
+/* ANCHOR: fe_item_card_all */
+// ANCHOR: fe_item_card_template
 import { useState } from "react";
 import { ItemOutput } from "../contracts/ContractAbi";
 import { ContractAbi } from "../contracts";
@@ -10,8 +12,11 @@ interface ItemCardProps {
 const assetId = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 export default function ItemCard({ item, contract }: ItemCardProps) {
+  // ANCHOR_END: fe_item_card_template
+  // ANCHOR: fe_item_card_status
   const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
-
+  // ANCHOR_END: fe_item_card_status
+  // ANCHOR: fe_item_card_buy_item
   async function handleBuyItem() {
     if (contract !== null) {
       setStatus('loading')
@@ -28,8 +33,10 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
       }
     }
   }
+// ANCHOR_END: fe_item_card_buy_item
 
   return (
+    // ANCHOR: fe_item_cards
     <div className="item-card">
       <div>Id: {parseFloat(item.id.format()) * 1_000_000_000}</div>
       <div>Metadata: {item.metadata}</div>
@@ -39,7 +46,8 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
       {status === 'error' && <div>Something went wrong ❌</div>}
       {status === 'none' &&  <button onClick={handleBuyItem}>Buy Item</button>}
       {status === 'loading' && <div>Buying item..</div>}
-    
     </div>
+    // ANCHOR_END: fe_item_cards
   );
 }
+/* ANCHOR_END: fe_item_card_all */
