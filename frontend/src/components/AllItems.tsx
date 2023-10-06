@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { ContractAbi } from "../contracts";
 import { ItemOutput } from "../contracts/ContractAbi";
 import ItemCard from "./ItemCard";
+import { BN } from 'fuels';
 
 interface AllItemsProps {
   contract: ContractAbi | null;
@@ -22,7 +23,7 @@ export default function AllItems({ contract }: AllItemsProps) {
       if (contract !== null) {
         try {
           let { value } = await contract.functions.get_count().simulate();
-          let formattedValue = parseFloat(value.format()) * 1_000_000_000;
+          let formattedValue = new BN(value).toNumber()
           setItemCount(formattedValue);
           let max = formattedValue + 1;
           let tempItems = [];
