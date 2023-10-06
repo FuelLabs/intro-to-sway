@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ItemOutput } from "../contracts/ContractAbi";
 import { ContractAbi } from "../contracts";
+import { BN } from 'fuels';
 
 interface ItemCardProps {
   contract: ContractAbi | null;
@@ -38,10 +39,10 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
   return (
     // ANCHOR: fe_item_cards
     <div className="item-card">
-      <div>Id: {parseFloat(item.id.format()) * 1_000_000_000}</div>
+      <div>Id: {new BN(item.id).toNumber()}</div>
       <div>Metadata: {item.metadata}</div>
-      <div>Price: {parseFloat(item.price.format())} ETH</div>
-      <div>Total Bought: {parseFloat(item.total_bought.format()) * 1_000_000_000}</div>
+      <div>Price: {new BN(item.price).formatUnits()} ETH</div>
+      <div>Total Bought: {new BN(item.total_bought).toNumber()}</div>
       {status === 'success' && <div>Purchased ✅</div>}
       {status === 'error' && <div>Something went wrong ❌</div>}
       {status === 'none' &&  <button onClick={handleBuyItem}>Buy Item</button>}
