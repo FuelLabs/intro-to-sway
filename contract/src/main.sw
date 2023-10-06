@@ -5,7 +5,6 @@ contract;
 
 // ANCHOR: import
 use std::{
-    // imports the msg_sender function from the std library
     auth::msg_sender,
     call_frames::msg_asset_id,
     constants::BASE_ASSET_ID,
