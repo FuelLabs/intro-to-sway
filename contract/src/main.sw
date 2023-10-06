@@ -171,7 +171,7 @@ impl SwayStore for Contract {
     #[storage(read)]
     fn get_item(item_id: u64) -> Item {
         // returns the item for the given item_id
-        return storage.item_map.get(item_id).try_read().unwrap()
+        return storage.item_map.get(item_id).try_read().unwrap();
     }
     // ANCHOR_END: get_item
 
@@ -195,7 +195,7 @@ impl SwayStore for Contract {
         
         // ANCHOR: initialize_owner_return_owner
         // return the owner
-        return sender
+        return sender;
         // ANCHOR_END: initialize_owner_return_owner
     }
     // ANCHOR_END: initialize_owner_parent
@@ -235,7 +235,7 @@ impl SwayStore for Contract {
     // ANCHOR: get_count_parent
     #[storage(read)]
     fn get_count() -> u64 {
-        return storage.item_counter.try_read().unwrap()
+        return storage.item_counter.try_read().unwrap();
     }
     // ANCHOR_END: get_count_parent
 }
