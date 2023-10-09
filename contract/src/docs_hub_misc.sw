@@ -1,6 +1,5 @@
 /* ANCHOR: all */
 // ANCHOR: import_single
-// imports the msg_sender function from the std library
 use std::auth::msg_sender;
 // ANCHOR_END: import_single
 
