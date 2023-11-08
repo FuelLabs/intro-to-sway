@@ -4,13 +4,13 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.57.0
-  Forc version: 0.44.0
-  Fuel-Core version: 0.20.4
+  Fuels version: 0.65.0
+  Forc version: 0.46.1
+  Fuel-Core version: 0.20.8
 */
 
 import { Interface, Contract, ContractFactory } from "fuels";
-import type { Provider, Account, AbstractAddress, BytesLike, DeployContractOptions } from "fuels";
+import type { Provider, Account, AbstractAddress, BytesLike, DeployContractOptions, StorageSlot } from "fuels";
 import type { ContractAbi, ContractAbiInterface } from "../ContractAbi";
 
 const _abi = {
@@ -38,7 +38,7 @@ const _abi = {
         },
         {
           "name": "ContractId",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         }
       ],
@@ -50,12 +50,12 @@ const _abi = {
       "components": [
         {
           "name": "IncorrectAssetId",
-          "type": 1,
+          "type": 8,
           "typeArguments": null
         },
         {
           "name": "NotEnoughTokens",
-          "type": 10,
+          "type": 11,
           "typeArguments": null
         },
         {
@@ -98,7 +98,7 @@ const _abi = {
     },
     {
       "typeId": 8,
-      "type": "struct ContractId",
+      "type": "struct AssetId",
       "components": [
         {
           "name": "value",
@@ -110,16 +110,28 @@ const _abi = {
     },
     {
       "typeId": 9,
+      "type": "struct ContractId",
+      "components": [
+        {
+          "name": "value",
+          "type": 1,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 10,
       "type": "struct Item",
       "components": [
         {
           "name": "id",
-          "type": 10,
+          "type": 11,
           "typeArguments": null
         },
         {
           "name": "price",
-          "type": 10,
+          "type": 11,
           "typeArguments": null
         },
         {
@@ -134,14 +146,14 @@ const _abi = {
         },
         {
           "name": "total_bought",
-          "type": 10,
+          "type": 11,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 10,
+      "typeId": 11,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -152,7 +164,7 @@ const _abi = {
       "inputs": [
         {
           "name": "item_id",
-          "type": 10,
+          "type": 11,
           "typeArguments": null
         }
       ],
@@ -181,7 +193,7 @@ const _abi = {
       "name": "get_count",
       "output": {
         "name": "",
-        "type": 10,
+        "type": 11,
         "typeArguments": null
       },
       "attributes": [
@@ -197,14 +209,14 @@ const _abi = {
       "inputs": [
         {
           "name": "item_id",
-          "type": 10,
+          "type": 11,
           "typeArguments": null
         }
       ],
       "name": "get_item",
       "output": {
         "name": "",
-        "type": 9,
+        "type": 10,
         "typeArguments": null
       },
       "attributes": [
@@ -238,7 +250,7 @@ const _abi = {
       "inputs": [
         {
           "name": "price",
-          "type": 10,
+          "type": 11,
           "typeArguments": null
         },
         {
@@ -333,26 +345,53 @@ const _abi = {
   ],
   "messagesTypes": [],
   "configurables": []
-}
+};
+
+const _storageSlots: StorageSlot[] = [
+  {
+    "key": "b48b753af346966d0d169c0b2e3234611f65d5cfdb57c7b6e7cd6ca93707bee0",
+    "value": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+    "key": "b48b753af346966d0d169c0b2e3234611f65d5cfdb57c7b6e7cd6ca93707bee1",
+    "value": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+    "key": "f383b0ce51358be57daa3b725fe44acdb2d880604e367199080b4379c41bb6ed",
+    "value": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+];
 
 export class ContractAbi__factory {
-  static readonly abi = _abi
+  static readonly abi = _abi;
+
+  static readonly storageSlots = _storageSlots;
+
   static createInterface(): ContractAbiInterface {
     return new Interface(_abi) as unknown as ContractAbiInterface
   }
+
   static connect(
     id: string | AbstractAddress,
     accountOrProvider: Account | Provider
   ): ContractAbi {
     return new Contract(id, _abi, accountOrProvider) as unknown as ContractAbi
   }
+
   static async deployContract(
     bytecode: BytesLike,
     wallet: Account,
     options: DeployContractOptions = {}
   ): Promise<ContractAbi> {
     const factory = new ContractFactory(bytecode, _abi, wallet);
-    const contract = await factory.deployContract(options);
+
+    const { storageSlots } = ContractAbi__factory;
+
+    const contract = await factory.deployContract({
+      storageSlots,
+      ...options,
+    });
+
     return contract as unknown as ContractAbi;
   }
 }

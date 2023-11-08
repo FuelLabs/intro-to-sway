@@ -10,7 +10,7 @@ import ListItem from "./components/ListItem";
 import "./App.css";
 
 // ANCHOR: fe_contract_id
-const CONTRACT_ID = "0xe924cde59c8b07fe4155f484038cdab8a027e3549eda80022c7c515a4933a594"
+const CONTRACT_ID = "0xfece81e27ec47a789d84f5c6f72278dece588e8ff652f65332ea5037539e1c9e"
 // ANCHOR_END: fe_contract_id
 
 function App() {
