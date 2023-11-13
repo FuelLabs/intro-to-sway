@@ -5,7 +5,7 @@ use fuels::{prelude::*, types::{Identity, SizedAsciiString}};
 // ANCHOR: rs_abi
 // Load abi from json
 abigen!(Contract(name="SwayStore", abi="out/debug/contract-abi.json"));
-// ANCHOR: rs_abi
+// ANCHOR_END: rs_abi
 
 // ANCHOR: rs_contract_instance_parent
 async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<WalletUnlocked>) {
