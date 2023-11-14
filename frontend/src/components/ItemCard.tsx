@@ -34,21 +34,20 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
       }
     }
   }
-// ANCHOR_END: fe_item_card_buy_item
-
+  // ANCHOR_END: fe_item_card_buy_item
+  // ANCHOR: fe_item_cards
   return (
-    // ANCHOR: fe_item_cards
     <div className="item-card">
       <div>Id: {new BN(item.id).toNumber()}</div>
       <div>Metadata: {item.metadata}</div>
       <div>Price: {new BN(item.price).formatUnits()} ETH</div>
-      <div>Total Bought: {new BN(item.total_bought).toNumber()}</div>
+      <h3>Total Bought: {new BN(item.total_bought).toNumber()}</h3>
       {status === 'success' && <div>Purchased ✅</div>}
       {status === 'error' && <div>Something went wrong ❌</div>}
       {status === 'none' &&  <button onClick={handleBuyItem}>Buy Item</button>}
       {status === 'loading' && <div>Buying item..</div>}
     </div>
-    // ANCHOR_END: fe_item_cards
   );
 }
+// ANCHOR_END: fe_item_cards
 /* ANCHOR_END: fe_item_card_all */

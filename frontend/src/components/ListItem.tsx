@@ -37,11 +37,10 @@ export default function ListItem({contract}: ListItemsProps){
         }
     }
     // ANCHOR_END: fe_list_items_handle_submit
-    
+    // ANCHOR: fe_list_items_form
     return (
         <div>
             <h2>List an Item</h2>
-            {/* ANCHOR: fe_list_items_form */}
             {status === 'none' &&
             <form onSubmit={handleSubmit}>
                 <div className="form-control">
@@ -81,8 +80,9 @@ export default function ListItem({contract}: ListItemsProps){
             {status === 'success' && <div>Item successfully listed!</div>}
             {status === 'error' && <div>Error listing item. Please try again.</div>}
             {status === 'loading' && <div>Listing item...</div>}
-            {/* ANCHOR_END: fe_list_items_form */}
+            
         </div>
     )
 }
+// ANCHOR_END: fe_list_items_form
 /* ANCHOR_END: fe_list_items_all */
