@@ -42,10 +42,10 @@ export default function AllItems({ contract }: AllItemsProps) {
     getAllItems();
   }, [contract]);
   // ANCHOR_END: fe_all_items_use_effect
+  // ANCHOR: fe_all_items_cards
   return (
     <div>
       <h2>All Items</h2>
-      {/* ANCHOR: fe_all_items_cards */}
       {status === 'success' &&
         <div>
           {itemCount === 0 ? (
@@ -64,8 +64,8 @@ export default function AllItems({ contract }: AllItemsProps) {
       }
       {status === 'error' && <div>Something went wrong, try reloading the page.</div>}
       {status === 'loading' && <div>Loading...</div>}
-      {/* ANCHOR_END: fe_all_items_cards */}
     </div>
   );
 }
+// ANCHOR_END: fe_all_items_cards
 /* ANCHOR_END: fe_all_items_all */

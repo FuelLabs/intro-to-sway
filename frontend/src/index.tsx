@@ -1,3 +1,4 @@
+/* ANCHOR: fe_index_all */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
@@ -14,3 +15,4 @@ root.render(
     </FuelProvider> 
   </React.StrictMode>
 );
+/* ANCHOR: fe_index_all */
