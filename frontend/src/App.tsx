@@ -20,21 +20,21 @@ function App() {
   // ANCHOR_END: fe_state_active
   // ANCHOR: fe_call_hooks
   const { isConnected } = useIsConnected();
-  const fuelObj = useFuel();
-  const accountObj = useAccount();
+  const { fuel } = useFuel();
+  const { account } = useAccount();
   // ANCHOR: fe_wallet
-  const walletObj = useWallet({ address: accountObj.account });
+  const { wallet } = useWallet({ address: account });
   // ANCHOR_END: fe_wallet
   // ANCHOR_END: fe_call_hooks
   
   // ANCHOR: fe_use_memo
   const contract = useMemo(() => {
-    if (walletObj.wallet) {
-      const contract = ContractAbi__factory.connect(CONTRACT_ID, walletObj.wallet);
+    if (wallet) {
+      const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
     }
     return null;
-  }, [walletObj]);
+  }, [wallet]);
   // ANCHOR_END: fe_use_memo
 
   return (
@@ -61,7 +61,7 @@ function App() {
       </nav>
       {/* ANCHOR: fe_ui_state_active */}
       {/* ANCHOR: fe_fuel_obj */}
-      {fuelObj.fuel ? (
+      {fuel ? (
         <div>
           { isConnected ? (
             <div>
@@ -74,7 +74,7 @@ function App() {
               </div>
           ) : (
             <div>
-              <button onClick={() => fuelObj.fuel?.connect()}>
+              <button onClick={() => fuel?.connect()}>
                 Connect Wallet
               </button>
           </div>
