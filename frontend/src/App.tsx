@@ -42,7 +42,7 @@ function App() {
       <header>
         <h1>Sway Marketplace</h1>
       </header>
-      {/* ANCHOR: fe_ui_state_active */}
+      {/* // ANCHOR: fe_ui_state_active */}
       <nav>
         <ul>
           <li 
@@ -59,18 +59,14 @@ function App() {
           </li>
         </ul>
       </nav>
-      {/* ANCHOR: fe_ui_state_active */}
-      {/* ANCHOR: fe_fuel_obj */}
+      {/* // ANCHOR: fe_ui_state_active */}
+      {/* // ANCHOR: fe_fuel_obj */}
       {fuel ? (
         <div>
           { isConnected ? (
             <div>
-              {/* ANCHOR: fe_items_contract */}
-              {/* ANCHOR: fe_all_items_contract */}
               {active === 'all-items' && <AllItems contract={contract} />}
-              {/* ANCHOR_END: fe_all_items_contract */}
               {active === 'list-item' && <ListItem contract={contract} />}
-              {/* ANCHOR_END: fe_items_contract */}
               </div>
           ) : (
             <div>
@@ -93,7 +89,7 @@ function App() {
           to use the app.
         </div>
       )}
-      {/* ANCHOR_END: fe_fuel_obj */}
+      {/* // ANCHOR_END: fe_fuel_obj */}
     </div>
   );
 }
