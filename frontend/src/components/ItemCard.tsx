@@ -44,7 +44,7 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
       <h3>Total Bought: {new BN(item.total_bought).toNumber()}</h3>
       {status === 'success' && <div>Purchased ✅</div>}
       {status === 'error' && <div>Something went wrong ❌</div>}
-      {status === 'none' &&  <button onClick={handleBuyItem}>Buy Item</button>}
+      {status === 'none' &&  <button data-testid={`buy-button-${item.id}`} onClick={handleBuyItem}>Buy Item</button>}
       {status === 'loading' && <div>Buying item..</div>}
     </div>
   );
