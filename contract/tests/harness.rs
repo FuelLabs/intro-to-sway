@@ -19,7 +19,8 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
         None,
         None,
     )
-    .await;
+    .await
+    .unwrap();
 
     let wallet = wallets.get(0).unwrap().clone();
     
@@ -29,7 +30,7 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
         LoadConfiguration::default(),
     )
     .unwrap()
-    .deploy(&wallet, TxParameters::default())
+    .deploy(&wallet, TxPolicies::default())
     .await
     .unwrap();
     // ANCHOR_END: rs_contract_instance_config
@@ -47,6 +48,8 @@ async fn can_set_owner() {
 
     // get access to a test wallet
     let wallet_1 = wallets.get(0).unwrap();
+
+    println!("HERE {:?} END", wallet_1);
 
     // initialize wallet_1 as the owner
     let owner_result = instance
