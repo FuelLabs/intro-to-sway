@@ -49,8 +49,6 @@ async fn can_set_owner() {
     // get access to a test wallet
     let wallet_1 = wallets.get(0).unwrap();
 
-    println!("HERE {:?} END", wallet_1);
-
     // initialize wallet_1 as the owner
     let owner_result = instance
         .with_account(wallet_1.clone())
@@ -247,11 +245,8 @@ async fn can_withdraw_funds() {
     let balance_2: u64 = wallet_2.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
     let balance_3: u64 = wallet_3.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
 
-    // println!("BALANCE 1: {:?}", balance_1);
     assert!(balance_1 == 1007500000);
-    // println!("BALANCE 2: {:?}", balance_2);
     assert!(balance_2 == 1142500000);
-    // println!("BALANCE 3: {:?}", balance_3);
     assert!(balance_3 == 850000000);
 }
 // ANCHOR_END: rs_test_withdraw_funds
