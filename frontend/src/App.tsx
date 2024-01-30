@@ -23,7 +23,7 @@ function App() {
   const { fuel } = useFuel();
   const { account } = useAccount();
   // ANCHOR: fe_wallet
-  const { wallet } = useWallet({ address: account });
+  const { wallet } = useWallet(account);
   // ANCHOR_END: fe_wallet
   // ANCHOR_END: fe_call_hooks
   

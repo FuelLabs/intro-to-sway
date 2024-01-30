@@ -26,7 +26,13 @@ export default function ListItem({contract}: ListItemsProps){
         if(contract !== null){
             try {
                 const priceInput = bn.parseUnits(price.toString());
-                await contract.functions.list_item(priceInput, metadata).call();
+                await contract.functions
+                .list_item(priceInput, metadata)
+                .txParams({
+                    gasPrice: 1,
+                    gasLimit: 300_000,
+                })
+                .call();
                 setStatus('success')
             } catch (e) {
                 console.log("ERROR:", e);
