@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.65.0
-  Forc version: 0.46.1
-  Fuel-Core version: 0.20.8
+  Fuels version: 0.72.0
+  Forc version: 0.48.1
+  Fuel-Core version: 0.22.0
 */
 
 import { Interface, Contract, ContractFactory } from "fuels";
@@ -33,12 +33,12 @@ const _abi = {
       "components": [
         {
           "name": "Address",
-          "type": 7,
+          "type": 6,
           "typeArguments": null
         },
         {
           "name": "ContractId",
-          "type": 9,
+          "type": 8,
           "typeArguments": null
         }
       ],
@@ -50,12 +50,12 @@ const _abi = {
       "components": [
         {
           "name": "IncorrectAssetId",
-          "type": 8,
+          "type": 7,
           "typeArguments": null
         },
         {
           "name": "NotEnoughTokens",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         },
         {
@@ -68,24 +68,18 @@ const _abi = {
     },
     {
       "typeId": 4,
-      "type": "str[20]",
+      "type": "str",
       "components": null,
       "typeParameters": null
     },
     {
       "typeId": 5,
-      "type": "str[21]",
+      "type": "str[20]",
       "components": null,
       "typeParameters": null
     },
     {
       "typeId": 6,
-      "type": "str[25]",
-      "components": null,
-      "typeParameters": null
-    },
-    {
-      "typeId": 7,
       "type": "struct Address",
       "components": [
         {
@@ -97,7 +91,7 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 8,
+      "typeId": 7,
       "type": "struct AssetId",
       "components": [
         {
@@ -109,7 +103,7 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 9,
+      "typeId": 8,
       "type": "struct ContractId",
       "components": [
         {
@@ -121,17 +115,17 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 10,
+      "typeId": 9,
       "type": "struct Item",
       "components": [
         {
           "name": "id",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         },
         {
           "name": "price",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         },
         {
@@ -141,19 +135,19 @@ const _abi = {
         },
         {
           "name": "metadata",
-          "type": 4,
+          "type": 5,
           "typeArguments": null
         },
         {
           "name": "total_bought",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 11,
+      "typeId": 10,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -164,7 +158,7 @@ const _abi = {
       "inputs": [
         {
           "name": "item_id",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         }
       ],
@@ -193,7 +187,7 @@ const _abi = {
       "name": "get_count",
       "output": {
         "name": "",
-        "type": 11,
+        "type": 10,
         "typeArguments": null
       },
       "attributes": [
@@ -209,14 +203,14 @@ const _abi = {
       "inputs": [
         {
           "name": "item_id",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         }
       ],
       "name": "get_item",
       "output": {
         "name": "",
-        "type": 10,
+        "type": 9,
         "typeArguments": null
       },
       "attributes": [
@@ -250,12 +244,12 @@ const _abi = {
       "inputs": [
         {
           "name": "price",
-          "type": 11,
+          "type": 10,
           "typeArguments": null
         },
         {
           "name": "metadata",
-          "type": 4,
+          "type": 5,
           "typeArguments": null
         }
       ],
@@ -314,7 +308,7 @@ const _abi = {
       "logId": 2,
       "loggedType": {
         "name": "",
-        "type": 6,
+        "type": 4,
         "typeArguments": null
       }
     },
@@ -322,7 +316,7 @@ const _abi = {
       "logId": 3,
       "loggedType": {
         "name": "",
-        "type": 5,
+        "type": 4,
         "typeArguments": null
       }
     },
