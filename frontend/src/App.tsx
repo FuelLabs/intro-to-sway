@@ -5,7 +5,6 @@ import { useState, useMemo } from "react";
 import {
   useFuel,
   useIsConnected,
-  useAccount,
   useWallet,
 } from "@fuel-wallet/react";
 // ANCHOR_END: fe_import_hooks
@@ -27,9 +26,8 @@ function App() {
   // ANCHOR: fe_call_hooks
   const { isConnected } = useIsConnected();
   const { fuel } = useFuel();
-  const { account } = useAccount();
   // ANCHOR: fe_wallet
-  const { wallet } = useWallet(account);
+  const { wallet } = useWallet();
   // ANCHOR_END: fe_wallet
   // ANCHOR_END: fe_call_hooks
 
