@@ -2,11 +2,7 @@
 // ANCHOR: fe_app_template
 import { useState, useMemo } from "react";
 // ANCHOR: fe_import_hooks
-import {
-  useFuel,
-  useIsConnected,
-  useWallet,
-} from "@fuel-wallet/react";
+import { useConnectUI, useIsConnected, useWallet } from "@fuel-wallet/react";
 // ANCHOR_END: fe_import_hooks
 import { ContractAbi__factory } from "./contracts";
 import AllItems from "./components/AllItems";
@@ -25,7 +21,7 @@ function App() {
   // ANCHOR_END: fe_state_active
   // ANCHOR: fe_call_hooks
   const { isConnected } = useIsConnected();
-  const { fuel } = useFuel();
+  const { connect, isConnecting } = useConnectUI();
   // ANCHOR: fe_wallet
   const { wallet } = useWallet();
   // ANCHOR_END: fe_wallet
@@ -65,32 +61,24 @@ function App() {
       </nav>
       {/* // ANCHOR: fe_ui_state_active */}
       {/* // ANCHOR: fe_fuel_obj */}
-      {fuel ? (
-        <div>
-          {isConnected ? (
-            <div>
-              {active === "all-items" && <AllItems contract={contract} />}
-              {active === "list-item" && <ListItem contract={contract} />}
-            </div>
-          ) : (
-            <div>
-              <button onClick={() => fuel?.connect()}>Connect Wallet</button>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div>
-          Download the{" "}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://wallet.fuel.network/"
-          >
-            Fuel Wallet
-          </a>{" "}
-          to use the app.
-        </div>
-      )}
+      <div>
+        {isConnected ? (
+          <div>
+            {active === "all-items" && <AllItems contract={contract} />}
+            {active === "list-item" && <ListItem contract={contract} />}
+          </div>
+        ) : (
+          <div>
+            <button
+              onClick={() => {
+                connect();
+              }}
+            >
+              {isConnecting ? "Connecting" : "Connect"}
+            </button>
+          </div>
+        )}
+      </div>
       {/* // ANCHOR_END: fe_fuel_obj */}
     </div>
   );
