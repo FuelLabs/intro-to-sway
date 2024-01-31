@@ -23,7 +23,11 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
       setStatus('loading')
       try {
         await contract.functions.buy_item(item.id)
-        .txParams({ variableOutputs: 1 })
+        .txParams({ 
+          variableOutputs: 1,
+          gasPrice: 1,
+          gasLimit: 300_000,
+        })
         .callParams({
             forward: [item.price, assetId],
           })

@@ -12,7 +12,7 @@ use std::{
         msg_amount,
         this_balance,
     },
-    token::transfer,
+    asset::transfer,
     hash::Hash
 };
 // ANCHOR_END: import
@@ -182,7 +182,7 @@ impl SwayStore for Contract {
         let owner = storage.owner.try_read().unwrap();
         
         // make sure the owner has NOT already been initialized
-        require(owner.is_none(), __to_str_array("owner already initialized"));
+        require(owner.is_none(), "owner already initialized");
         // ANCHOR_END: initialize_owner_get_owner
         
         // ANCHOR: initialize_owner_set_owner
@@ -207,7 +207,7 @@ impl SwayStore for Contract {
         let owner = storage.owner.try_read().unwrap();
 
         // make sure the owner has been initialized
-        require(owner.is_some(), __to_str_array("owner not initialized"));
+        require(owner.is_some(), "owner not initialized");
         // ANCHOR_END: withdraw_funds_set_owner
         
         // ANCHOR: withdraw_funds_require_owner

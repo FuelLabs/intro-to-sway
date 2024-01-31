@@ -19,7 +19,8 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
         None,
         None,
     )
-    .await;
+    .await
+    .unwrap();
 
     let wallet = wallets.get(0).unwrap().clone();
     
@@ -29,7 +30,7 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
         LoadConfiguration::default(),
     )
     .unwrap()
-    .deploy(&wallet, TxParameters::default())
+    .deploy(&wallet, TxPolicies::default())
     .await
     .unwrap();
     // ANCHOR_END: rs_contract_instance_config
@@ -244,11 +245,8 @@ async fn can_withdraw_funds() {
     let balance_2: u64 = wallet_2.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
     let balance_3: u64 = wallet_3.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
 
-    // println!("BALANCE 1: {:?}", balance_1);
     assert!(balance_1 == 1007500000);
-    // println!("BALANCE 2: {:?}", balance_2);
     assert!(balance_2 == 1142500000);
-    // println!("BALANCE 3: {:?}", balance_3);
     assert!(balance_3 == 850000000);
 }
 // ANCHOR_END: rs_test_withdraw_funds
