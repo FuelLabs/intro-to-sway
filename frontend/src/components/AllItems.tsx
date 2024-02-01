@@ -2,9 +2,9 @@
 // ANCHOR: fe_all_items_template
 import { useState, useEffect } from "react";
 import { ContractAbi } from "../contracts";
-import { ItemOutput } from "../contracts/ContractAbi";
 import ItemCard from "./ItemCard";
 import { BN } from "fuels";
+import { ItemOutput } from "../contracts/contracts/ContractAbi";
 
 interface AllItemsProps {
   contract: ContractAbi | null;

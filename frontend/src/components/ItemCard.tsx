@@ -1,7 +1,7 @@
 /* ANCHOR: fe_item_card_all */
 // ANCHOR: fe_item_card_template
 import { useState } from "react";
-import { ItemOutput } from "../contracts/ContractAbi";
+import { ItemOutput } from "../contracts/contracts/ContractAbi";
 import { ContractAbi } from "../contracts";
 import { BN } from 'fuels';
 
