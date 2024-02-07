@@ -3,7 +3,6 @@ import { createConfig } from "fuels";
 export default createConfig({
   contracts: ["../contract"],
   output: "./src/contracts",
-  useBuiltinForc: false,
 });
 
 /**
