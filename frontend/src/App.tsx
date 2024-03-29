@@ -2,7 +2,7 @@
 // ANCHOR: fe_app_template
 import { useState, useMemo } from "react";
 // ANCHOR: fe_import_hooks
-import { useConnectUI, useIsConnected, useWallet } from "@fuel-wallet/react";
+import { useConnectUI, useIsConnected, useWallet } from "@fuels/react";
 // ANCHOR_END: fe_import_hooks
 import { ContractAbi__factory } from "./contracts";
 import AllItems from "./components/AllItems";

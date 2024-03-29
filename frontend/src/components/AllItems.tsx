@@ -30,7 +30,7 @@ export default function AllItems({ contract }: AllItemsProps) {
               gasPrice: 1,
               gasLimit: 100_000,
             })
-            .simulate();
+            .get();
           let formattedValue = new BN(value).toNumber();
           setItemCount(formattedValue);
           let max = formattedValue + 1;
@@ -42,7 +42,7 @@ export default function AllItems({ contract }: AllItemsProps) {
                 gasPrice: 1,
                 gasLimit: 100_000,
               })
-              .simulate();
+              .get();
             tempItems.push(resp.value);
           }
           setItems(tempItems);
