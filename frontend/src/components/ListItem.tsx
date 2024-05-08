@@ -29,7 +29,6 @@ export default function ListItem({contract}: ListItemsProps){
                 await contract.functions
                 .list_item(priceInput, metadata)
                 .txParams({
-                    gasPrice: 1,
                     gasLimit: 300_000,
                 })
                 .call();

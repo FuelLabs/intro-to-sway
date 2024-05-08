@@ -52,7 +52,6 @@ async fn can_set_owner() {
     // initialize wallet_1 as the owner
     let owner_result = instance
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .initialize_owner()
         .call()
@@ -75,9 +74,8 @@ async fn can_set_owner_only_once() {
     let wallet_2 = wallets.get(1).unwrap();
 
     // initialize wallet_1 as the owner
-    let _owner_result = instance
+    let _owner_result = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .initialize_owner()
         .call()
@@ -86,9 +84,8 @@ async fn can_set_owner_only_once() {
 
     // this should fail
     // try to set the owner from wallet_2
-    let _fail_owner_result = instance
+    let _fail_owner_result = instance.clone()
         .with_account(wallet_2.clone())
-        .unwrap()
         .methods()
         .initialize_owner()
         .call()
@@ -114,9 +111,8 @@ async fn can_list_and_buy_item() {
     let item_1_price: u64 = 15;
 
     // list item 1 from wallet_1
-    let _item_1_result = instance
+    let _item_1_result = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .list_item(item_1_price, item_1_metadata)
         .call()
@@ -127,9 +123,8 @@ async fn can_list_and_buy_item() {
     let call_params = CallParameters::default().with_amount(item_1_price);
 
     // buy item 1 from wallet_2
-    let _item_1_purchase = instance
+    let _item_1_purchase = instance.clone()
         .with_account(wallet_2.clone())
-        .unwrap()
         .methods()
         .buy_item(1)
         .append_variable_outputs(1)
@@ -140,8 +135,8 @@ async fn can_list_and_buy_item() {
         .unwrap();
 
     // check the balances of wallet_1 and wallet_2
-    let balance_1: u64 = wallet_1.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
-    let balance_2: u64 = wallet_2.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
+    let balance_1: u64 = wallet_1.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+    let balance_2: u64 = wallet_2.get_asset_balance(&AssetId::zeroed()).await.unwrap();
 
     // make sure the price was transferred from wallet_2 to wallet_1
     assert!(balance_1 == 1000000015);
@@ -167,9 +162,8 @@ async fn can_withdraw_funds() {
     let wallet_3 = wallets.get(2).unwrap();
 
     // initialize wallet_1 as the owner
-    let owner_result = instance
+    let owner_result = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .initialize_owner()
         .call()
@@ -186,9 +180,8 @@ async fn can_withdraw_funds() {
     let item_1_price: u64 = 150_000_000;
 
     // list item 1 from wallet_2
-    let item_1_result = instance
+    let item_1_result = instance.clone()
         .with_account(wallet_2.clone())
-        .unwrap()
         .methods()
         .list_item(item_1_price, item_1_metadata)
         .call()
@@ -196,7 +189,7 @@ async fn can_withdraw_funds() {
     assert!(item_1_result.is_ok());
 
     // make sure the item count increased
-    let count = instance
+    let count = instance.clone()
         .methods()
         .get_count()
         .simulate()
@@ -208,9 +201,8 @@ async fn can_withdraw_funds() {
     let call_params = CallParameters::default().with_amount(item_1_price);
     
     // buy item 1 from wallet_3
-    let item_1_purchase = instance
+    let item_1_purchase = instance.clone()
         .with_account(wallet_3.clone())
-        .unwrap()
         .methods()
         .buy_item(1)
         .append_variable_outputs(1)
@@ -232,7 +224,6 @@ async fn can_withdraw_funds() {
     // withdraw the balance from the owner's wallet
     let withdraw = instance
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .withdraw_funds()
         .append_variable_outputs(1)
@@ -241,9 +232,9 @@ async fn can_withdraw_funds() {
     assert!(withdraw.is_ok());
 
     // check the balances of wallet_1 and wallet_2
-    let balance_1: u64 = wallet_1.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
-    let balance_2: u64 = wallet_2.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
-    let balance_3: u64 = wallet_3.get_asset_balance(&BASE_ASSET_ID).await.unwrap();
+    let balance_1: u64 = wallet_1.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+    let balance_2: u64 = wallet_2.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+    let balance_3: u64 = wallet_3.get_asset_balance(&AssetId::zeroed()).await.unwrap();
 
     assert!(balance_1 == 1007500000);
     assert!(balance_2 == 1142500000);
