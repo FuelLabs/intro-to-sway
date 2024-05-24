@@ -11,7 +11,7 @@ import "./App.css";
 
 // ANCHOR: fe_contract_id
 const CONTRACT_ID =
-  "0x3b598fc9103ce3c5c7a29663aee51099b3374958ba1016280caf802fdeb5aad8";
+  "0x797d208d0104131c2ab1f1e09c4914c7aef5b699fb494be864a5c37057076921";
 // ANCHOR_END: fe_contract_id
 
 function App() {
