@@ -7,13 +7,12 @@ contract;
 use std::{
     auth::msg_sender,
     call_frames::msg_asset_id,
-    constants::BASE_ASSET_ID,
     context::{
         msg_amount,
         this_balance,
     },
     asset::transfer,
-    hash::Hash
+    hash::Hash,
 };
 // ANCHOR_END: import
 
@@ -125,7 +124,7 @@ impl SwayStore for Contract {
 
         // require that the correct asset was sent
         // ANCHOR: buy_item_require_not_base
-        require(asset_id == BASE_ASSET_ID, InvalidError::IncorrectAssetId(asset_id));
+        require(asset_id == AssetId::base(), InvalidError::IncorrectAssetId(asset_id));
         // ANCHOR_END: buy_item_require_not_base
 
         // get the amount of coins sent
@@ -219,7 +218,7 @@ impl SwayStore for Contract {
         
         // ANCHOR: withdraw_funds_require_base_asset
         // get the current balance of this contract for the base asset
-        let amount = this_balance(BASE_ASSET_ID);
+        let amount = this_balance(AssetId::base());
 
         // require the contract balance to be more than 0
         require(amount > 0, InvalidError::NotEnoughTokens(amount));
@@ -227,7 +226,7 @@ impl SwayStore for Contract {
         
         // ANCHOR: withdraw_funds_transfer_owner
         // send the amount to the owner
-        transfer(owner.unwrap(), BASE_ASSET_ID, amount);
+        transfer(owner.unwrap(), AssetId::base(), amount);
         // ANCHOR_END: withdraw_funds_transfer_owner
     }
     // ANCHOR_END: withdraw_funds_parent

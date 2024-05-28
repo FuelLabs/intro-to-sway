@@ -10,8 +10,6 @@ interface ItemCardProps {
   item: ItemOutput;
 }
 
-const assetId = "0x0000000000000000000000000000000000000000000000000000000000000000"
-
 export default function ItemCard({ item, contract }: ItemCardProps) {
   // ANCHOR_END: fe_item_card_template
   // ANCHOR: fe_item_card_status
@@ -22,19 +20,19 @@ export default function ItemCard({ item, contract }: ItemCardProps) {
     if (contract !== null) {
       setStatus('loading')
       try {
+        const baseAssetId = contract.provider.getBaseAssetId();
         await contract.functions.buy_item(item.id)
         .txParams({ 
           variableOutputs: 1,
-          gasPrice: 1,
-          gasLimit: 300_000,
         })
         .callParams({
-            forward: [item.price, assetId],
+            forward: [item.price, baseAssetId],
           })
         .call()
         setStatus("success");
       } catch (e) {
         console.log("ERROR:", e);
+        setStatus("error");
       }
     }
   }

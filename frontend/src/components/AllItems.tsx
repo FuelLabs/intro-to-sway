@@ -27,7 +27,6 @@ export default function AllItems({ contract }: AllItemsProps) {
           let { value } = await contract.functions
             .get_count()
             .txParams({
-              gasPrice: 1,
               gasLimit: 100_000,
             })
             .get();
@@ -39,7 +38,6 @@ export default function AllItems({ contract }: AllItemsProps) {
             let resp = await contract.functions
               .get_item(i)
               .txParams({
-                gasPrice: 1,
                 gasLimit: 100_000,
               })
               .get();

@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.73.0
-  Forc version: 0.49.2
-  Fuel-Core version: 0.22.0
+  Fuels version: 0.88.1
+  Forc version: 0.59.0
+  Fuel-Core version: 0.26.0
 */
 
 import type {
@@ -27,11 +27,11 @@ export type IdentityOutput = Enum<{ Address: AddressOutput, ContractId: Contract
 export type InvalidErrorInput = Enum<{ IncorrectAssetId: AssetIdInput, NotEnoughTokens: BigNumberish, OnlyOwner: IdentityInput }>;
 export type InvalidErrorOutput = Enum<{ IncorrectAssetId: AssetIdOutput, NotEnoughTokens: BN, OnlyOwner: IdentityOutput }>;
 
-export type AddressInput = { value: string };
+export type AddressInput = { bits: string };
 export type AddressOutput = AddressInput;
-export type AssetIdInput = { value: string };
+export type AssetIdInput = { bits: string };
 export type AssetIdOutput = AssetIdInput;
-export type ContractIdInput = { value: string };
+export type ContractIdInput = { bits: string };
 export type ContractIdOutput = ContractIdInput;
 export type ItemInput = { id: BigNumberish, price: BigNumberish, owner: IdentityInput, metadata: string, total_bought: BigNumberish };
 export type ItemOutput = { id: BN, price: BN, owner: IdentityOutput, metadata: string, total_bought: BN };
