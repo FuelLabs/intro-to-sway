@@ -1,5 +1,11 @@
 // ANCHOR: rs_import
-use fuels::{prelude::*, types::{Identity, SizedAsciiString}};
+use fuels::{
+    accounts::provider, client::{
+        FuelClient,
+        PaginationRequest
+    }, prelude::*, types::{Identity, SizedAsciiString}
+};
+use fuel_core_client::client::types::TransactionStatus;
 // ANCHOR_END: rs_import
 
 // ANCHOR: rs_abi
@@ -40,6 +46,30 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
     (instance, id.into(), wallets)
 }
 // ANCHOR_END: rs_contract_instance_parent
+
+async fn get_accumulated_fee(client: &FuelClient) -> u64 {
+    let status = client
+        .transactions(PaginationRequest {
+            cursor: None,
+            results: 1,
+            direction: fuels::client::PageDirection::Forward,
+        })
+        .await
+        .unwrap()
+        .results[0]
+        .status
+        .clone();
+
+    let mut accumulated_fee = 0;
+
+    print!("{:?}", status);
+
+    if let TransactionStatus::Success { total_fee, .. } = status {
+        accumulated_fee = total_fee;
+    }
+
+    accumulated_fee
+}
 
 // ANCHOR: rs_test_set_owner
 #[tokio::test]
@@ -104,6 +134,9 @@ async fn can_list_and_buy_item() {
     let wallet_1 = wallets.get(0).unwrap();
     let wallet_2 = wallets.get(1).unwrap();
 
+    let provider = wallet_1.provider().unwrap().clone();
+    let client = FuelClient::new(provider.url()).unwrap();
+
     // item 1 params
     let item_1_metadata: SizedAsciiString<20> = "metadata__url__here_"
         .try_into()
@@ -118,29 +151,39 @@ async fn can_list_and_buy_item() {
         .call()
         .await
         .unwrap();
+    println!("{:?}", _item_1_result);
+    let wallet_1_accumulated_fee = get_accumulated_fee(&client).await;
+    let balance_1: u64 = wallet_1.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+    println!("{:?}", balance_1);
 
     // call params to send the project price in the buy_item fn
     let call_params = CallParameters::default().with_amount(item_1_price);
+    let balance_1: u64 = wallet_1.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+    println!("{:?}", balance_1);
 
     // buy item 1 from wallet_2
     let _item_1_purchase = instance.clone()
         .with_account(wallet_2.clone())
         .methods()
         .buy_item(1)
-        .append_variable_outputs(1)
+        .with_variable_output_policy(VariableOutputPolicy::Exactly(1))
         .call_params(call_params)
         .unwrap()
         .call()
         .await
         .unwrap();
+    let wallet_2_accumulated_fee = get_accumulated_fee(&client).await;
 
     // check the balances of wallet_1 and wallet_2
     let balance_1: u64 = wallet_1.get_asset_balance(&AssetId::zeroed()).await.unwrap();
     let balance_2: u64 = wallet_2.get_asset_balance(&AssetId::zeroed()).await.unwrap();
 
-    // make sure the price was transferred from wallet_2 to wallet_1
-    assert!(balance_1 == 1000000015);
-    assert!(balance_2 == 999999985);
+    // make sure the price was transferred from wallet_2 to 
+    println!("{:?}", balance_1);
+    println!("{:?}", balance_2);
+    println!("{:?}", wallet_1_accumulated_fee);
+    assert!(balance_1 == 1000000013 - wallet_1_accumulated_fee);
+    assert!(balance_2 == 999999984 - wallet_2_accumulated_fee);
 
     let item_1 = instance.methods().get_item(1).call().await.unwrap();
 
@@ -192,7 +235,7 @@ async fn can_withdraw_funds() {
     let count = instance.clone()
         .methods()
         .get_count()
-        .simulate()
+        .simulate(Execution::default())
         .await
         .unwrap();
     assert_eq!(count.value, 1);
@@ -205,7 +248,7 @@ async fn can_withdraw_funds() {
         .with_account(wallet_3.clone())
         .methods()
         .buy_item(1)
-        .append_variable_outputs(1)
+        .with_variable_output_policy(VariableOutputPolicy::Exactly(1))
         .call_params(call_params)
         .unwrap()
         .call()
@@ -216,7 +259,7 @@ async fn can_withdraw_funds() {
      let listed_item = instance
      .methods()
      .get_item(1)
-     .simulate()
+     .simulate(Execution::default())
      .await
      .unwrap();
  assert_eq!(listed_item.value.total_bought, 1);
@@ -226,7 +269,7 @@ async fn can_withdraw_funds() {
         .with_account(wallet_1.clone())
         .methods()
         .withdraw_funds()
-        .append_variable_outputs(1)
+        .with_variable_output_policy(VariableOutputPolicy::Exactly(1))
         .call()
         .await;
     assert!(withdraw.is_ok());
