@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 // ANCHOR: fe_import_hooks
 import { useConnectUI, useIsConnected, useWallet } from "@fuels/react";
 // ANCHOR_END: fe_import_hooks
-import { SwayStore } from "./sway-api";
+import { SwayStore } from "./sway-store-api";
 import AllItems from "./components/AllItems";
 import ListItem from "./components/ListItem";
 import "./App.css";

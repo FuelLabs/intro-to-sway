@@ -1,7 +1,7 @@
 /* ANCHOR: fe_list_items_all */
 // ANCHOR: fe_list_items_import
 import { useState } from "react";
-import { SwayStore } from "../sway-api";
+import { SwayStore } from "../sway-store-api";
 import { bn } from "fuels";
 // ANCHOR_END: fe_list_items_import
 

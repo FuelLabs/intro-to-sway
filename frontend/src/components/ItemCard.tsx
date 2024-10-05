@@ -1,8 +1,8 @@
 /* ANCHOR: fe_item_card_all */
 // ANCHOR: fe_item_card_template
 import { useState } from "react";
-import { ItemOutput } from "../sway-api/contracts/SwayStore";
-import { SwayStore } from "../sway-api";
+import { ItemOutput } from "../sway-store-api/contracts/SwayStore";
+import { SwayStore } from "../sway-store-api";
 import { BN } from 'fuels';
 
 interface ItemCardProps {
