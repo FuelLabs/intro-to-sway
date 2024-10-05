@@ -1,11 +1,13 @@
-import { createConfig } from "fuels";
+import { createConfig } from 'fuels';
 
 export default createConfig({
-  contracts: ["../contract"],
-  output: "./src/contracts",
+  contracts: [
+        '../sway-store',
+  ],
+  output: './src/sway-api',
 });
 
 /**
  * Check the docs:
- * https://fuellabs.github.io/fuels-ts/guide/cli/config-file
+ * https://fuellabs.github.io/fuels-ts/tooling/cli/fuels/config-file
  */

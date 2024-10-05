@@ -1,12 +1,12 @@
 /* ANCHOR: fe_item_card_all */
 // ANCHOR: fe_item_card_template
 import { useState } from "react";
-import { ItemOutput } from "../contracts/contracts/ContractAbi";
-import { ContractAbi } from "../contracts";
+import { ItemOutput } from "../sway-api/contracts/SwayStore";
+import { SwayStore } from "../sway-api";
 import { BN } from 'fuels';
 
 interface ItemCardProps {
-  contract: ContractAbi | null;
+  contract: SwayStore | null;
   item: ItemOutput;
 }
 

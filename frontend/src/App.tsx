@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 // ANCHOR: fe_import_hooks
 import { useConnectUI, useIsConnected, useWallet } from "@fuels/react";
 // ANCHOR_END: fe_import_hooks
-import { ContractAbi__factory } from "./contracts";
+import { SwayStore } from "./sway-api";
 import AllItems from "./components/AllItems";
 import ListItem from "./components/ListItem";
 import "./App.css";
@@ -30,7 +30,7 @@ function App() {
   // ANCHOR: fe_use_memo
   const contract = useMemo(() => {
     if (wallet) {
-      const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
+      const contract = new SwayStore(CONTRACT_ID, wallet)
       return contract;
     }
     return null;

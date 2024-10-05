@@ -1,13 +1,13 @@
 /* ANCHOR: fe_all_items_all */
 // ANCHOR: fe_all_items_template
 import { useState, useEffect } from "react";
-import { ContractAbi } from "../contracts";
+import { SwayStore } from "../sway-api";
 import ItemCard from "./ItemCard";
 import { BN } from "fuels";
-import { ItemOutput } from "../contracts/contracts/ContractAbi";
+import { ItemOutput } from "../sway-api/contracts/SwayStore";
 
 interface AllItemsProps {
-  contract: ContractAbi | null;
+  contract: SwayStore | null;
 }
 
 export default function AllItems({ contract }: AllItemsProps) {

@@ -1,13 +1,13 @@
 /* ANCHOR: fe_list_items_all */
 // ANCHOR: fe_list_items_import
 import { useState } from "react";
-import { ContractAbi } from "../contracts";
+import { SwayStore } from "../sway-api";
 import { bn } from "fuels";
 // ANCHOR_END: fe_list_items_import
 
 // ANCHOR: fe_list_items_interface
 interface ListItemsProps {
-  contract: ContractAbi | null;
+  contract: SwayStore | null;
 }
 // ANCHOR_END: fe_list_items_interface
 

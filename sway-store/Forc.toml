@@ -1,7 +1,7 @@
 [project]
-authors = ["Fuel Labs"]
+authors = ["Kin Chan"]
 entry = "main.sw"
 license = "Apache-2.0"
-name = "contract"
+name = "sway-store"
 
 [dependencies]
