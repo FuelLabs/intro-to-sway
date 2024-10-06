@@ -1,5 +1,0 @@
-    [1;32mBuilding[0m /Users/calldelegation/final/intro-to-sway/sway-store/sway-programs/contract
-   [1;32mCompiling[0m library [1mcore[0m (/Users/calldelegation/.forc/git/checkouts/std-9be0d6062747ea7/2156bfbbee01ffb85bfca2aae8f185f8e7c715a4/sway-lib-core)
-   [1;32mCompiling[0m library [1mstd[0m (git+https://github.com/fuellabs/sway?tag=v0.64.0#2156bfbbee01ffb85bfca2aae8f185f8e7c715a4)
-   [1;32mCompiling[0m contract [1mtest-contract[0m (/Users/calldelegation/final/intro-to-sway/sway-store/sway-programs/contract)
-    [1;32mFinished[0m debug [unoptimized + fuel] target(s) [25.44 KB] in 2.33s
