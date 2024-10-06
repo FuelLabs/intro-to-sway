@@ -1,0 +1,10 @@
+/Users/calldelegation/final/intro-to-sway/sway-store/sway-programs/contract/target/debug/deps/libsecrecy-2e667a1259d2f402.rmeta: /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/lib.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/boxed.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/string.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/vec.rs
+
+/Users/calldelegation/final/intro-to-sway/sway-store/sway-programs/contract/target/debug/deps/libsecrecy-2e667a1259d2f402.rlib: /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/lib.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/boxed.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/string.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/vec.rs
+
+/Users/calldelegation/final/intro-to-sway/sway-store/sway-programs/contract/target/debug/deps/secrecy-2e667a1259d2f402.d: /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/lib.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/boxed.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/string.rs /Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/vec.rs
+
+/Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/lib.rs:
+/Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/boxed.rs:
+/Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/string.rs:
+/Users/calldelegation/.cargo/registry/src/index.crates.io-6f17d22bba15001f/secrecy-0.8.0/src/vec.rs:
