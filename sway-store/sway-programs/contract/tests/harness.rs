@@ -13,7 +13,7 @@ use fuel_core_client::client::types::TransactionStatus;
 
 // ANCHOR: rs_abi
 // Load abi from json
-abigen!(Contract(name="SwayStore", abi="out/debug/contract-abi.json"));
+abigen!(Contract(name="SwayStore", abi="out/debug/test-contract-abi.json"));
 // ANCHOR_END: rs_abi
 
 // ANCHOR: rs_contract_instance_parent
@@ -35,7 +35,7 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
     
     // ANCHOR: rs_contract_instance_config
     let id = Contract::load_from(
-        "./out/debug/contract.bin",
+        "./out/debug/test-contract.bin",
         LoadConfiguration::default(),
     )
     .unwrap()
