@@ -1,10 +1,9 @@
 // ANCHOR: rs_import
 use fuels::{
     prelude::*, 
-    client::{
-        FuelClient,
-    },
+    client::FuelClient,
     types::{
+        Bytes32,
         Identity, 
         SizedAsciiString
     }
@@ -14,7 +13,7 @@ use fuel_core_client::client::types::TransactionStatus;
 
 // ANCHOR: rs_abi
 // Load abi from json
-abigen!(Contract(name="SwayStore", abi="out/debug/test-contract-abi.json"));
+abigen!(Contract(name="SwayStore", abi="out/debug/contract-abi.json"));
 // ANCHOR_END: rs_abi
 
 // ANCHOR: rs_contract_instance_parent
@@ -36,7 +35,7 @@ async fn get_contract_instance() -> (SwayStore<WalletUnlocked>, ContractId, Vec<
     
     // ANCHOR: rs_contract_instance_config
     let id = Contract::load_from(
-        "./out/debug/test-contract.bin",
+        "./out/debug/contract.bin",
         LoadConfiguration::default(),
     )
     .unwrap()
@@ -201,94 +200,122 @@ async fn can_list_and_buy_item() {
 }
 // ANCHOR_END: rs_test_list_and_buy_item
 
-// // ANCHOR: rs_test_withdraw_funds
-// #[tokio::test]
-// async fn can_withdraw_funds() {
-//     let (instance, _id, wallets) = get_contract_instance().await;
-//     // Now you have an instance of your contract you can use to test each function
+// ANCHOR: rs_test_withdraw_funds
+#[tokio::test]
+async fn can_withdraw_funds() {
+    let (instance, _id, wallets) = get_contract_instance().await;
+    // Now you have an instance of your contract you can use to test each function
 
-//     // get access to some test wallets
-//     let wallet_1 = wallets.get(0).unwrap();
-//     let wallet_2 = wallets.get(1).unwrap();
-//     let wallet_3 = wallets.get(2).unwrap();
+    // get access to some test wallets
+    let wallet_1 = wallets.get(0).unwrap();
+    let mut total_wallet_1_fees = 0;
+    let wallet_1_starting_balance: u64 = wallet_1
+        .get_asset_balance(&AssetId::zeroed())
+        .await
+        .unwrap();
 
-//     // initialize wallet_1 as the owner
-//     let owner_result = instance.clone()
-//         .with_account(wallet_1.clone())
-//         .methods()
-//         .initialize_owner()
-//         .call()
-//         .await
-//         .unwrap();
+    let wallet_2 = wallets.get(1).unwrap();
+    let mut total_wallet_2_fees = 0;
+    let wallet_2_starting_balance: u64 = wallet_2
+        .get_asset_balance(&AssetId::zeroed())
+        .await
+        .unwrap();
 
-//     // make sure the returned identity matches wallet_1
-//     assert!(Identity::Address(wallet_1.address().into()) == owner_result.value);
+    let wallet_3 = wallets.get(2).unwrap();
+    let mut total_wallet_3_fees = 0;
+    let wallet_3_starting_balance: u64 = wallet_3
+        .get_asset_balance(&AssetId::zeroed())
+        .await
+        .unwrap();
 
-//     // item 1 params
-//     let item_1_metadata: SizedAsciiString<20> = "metadata__url__here_"
-//         .try_into()
-//         .expect("Should have succeeded");
-//     let item_1_price: u64 = 150_000_000;
+    let provider = wallet_1.provider().unwrap().clone();
+    let client = FuelClient::new(provider.url()).unwrap();
 
-//     // list item 1 from wallet_2
-//     let item_1_result = instance.clone()
-//         .with_account(wallet_2.clone())
-//         .methods()
-//         .list_item(item_1_price, item_1_metadata)
-//         .call()
-//         .await;
-//     assert!(item_1_result.is_ok());
+    // initialize wallet_1 as the owner
+    let response = instance
+        .clone()
+        .with_account(wallet_1.clone())
+        .methods()
+        .initialize_owner()
+        .call()
+        .await
+        .unwrap();
+    let tx = response.tx_id.unwrap();
+    total_wallet_1_fees += get_tx_fee(&client, &tx).await;
 
-//     // make sure the item count increased
-//     let count = instance.clone()
-//         .methods()
-//         .get_count()
-//         .simulate(Execution::default())
-//         .await
-//         .unwrap();
-//     assert_eq!(count.value, 1);
+    // make sure the returned identity matches wallet_1
+    assert!(Identity::Address(wallet_1.address().into()) == response.value);
 
-//     // call params to send the project price in the buy_item fn
-//     let call_params = CallParameters::default().with_amount(item_1_price);
+    // item 1 params
+    let item_1_metadata: SizedAsciiString<20> = "metadata__url__here_"
+        .try_into()
+        .expect("Should have succeeded");
+    let item_1_price: u64 = 150_000_000;
+
+    // list item 1 from wallet_2
+    let response = instance
+        .clone()
+        .with_account(wallet_2.clone())
+        .methods()
+        .list_item(item_1_price, item_1_metadata)
+        .call()
+        .await;
+    assert!(response.is_ok());
+    total_wallet_2_fees += get_tx_fee(&client, &response.unwrap().tx_id.unwrap()).await;
+
+    // make sure the item count increased
+    let count = instance.clone()
+        .methods()
+        .get_count()
+        .simulate(Execution::default())
+        .await
+        .unwrap();
+    assert_eq!(count.value, 1);
+
+    // call params to send the project price in the buy_item fn
+    let call_params = CallParameters::default().with_amount(item_1_price);
     
-//     // buy item 1 from wallet_3
-//     let item_1_purchase = instance.clone()
-//         .with_account(wallet_3.clone())
-//         .methods()
-//         .buy_item(1)
-//         .with_variable_output_policy(VariableOutputPolicy::Exactly(1))
-//         .call_params(call_params)
-//         .unwrap()
-//         .call()
-//         .await;
-//     assert!(item_1_purchase.is_ok());
+    // buy item 1 from wallet_3
+    let response = instance.clone()
+        .with_account(wallet_3.clone())
+        .methods()
+        .buy_item(1)
+        .with_variable_output_policy(VariableOutputPolicy::Exactly(1))
+        .call_params(call_params)
+        .unwrap()
+        .call()
+        .await;
+    assert!(response.is_ok());
+    total_wallet_3_fees += get_tx_fee(&client, &response.unwrap().tx_id.unwrap()).await;
 
-//      // make sure the item's total_bought count increased
-//      let listed_item = instance
-//      .methods()
-//      .get_item(1)
-//      .simulate(Execution::default())
-//      .await
-//      .unwrap();
-//  assert_eq!(listed_item.value.total_bought, 1);
+     // make sure the item's total_bought count increased
+     let listed_item = instance
+        .methods()
+        .get_item(1)
+        .simulate(Execution::default())
+        .await
+        .unwrap();
+    assert_eq!(listed_item.value.total_bought, 1);
 
-//     // withdraw the balance from the owner's wallet
-//     let withdraw = instance
-//         .with_account(wallet_1.clone())
-//         .methods()
-//         .withdraw_funds()
-//         .with_variable_output_policy(VariableOutputPolicy::Exactly(1))
-//         .call()
-//         .await;
-//     assert!(withdraw.is_ok());
+    // withdraw the balance from the owner's wallet
+    let response = instance
+        .with_account(wallet_1.clone())
+        .methods()
+        .withdraw_funds()
+        .with_variable_output_policy(VariableOutputPolicy::Exactly(1))
+        .call()
+        .await;
+    assert!(response.is_ok());
+    total_wallet_1_fees += get_tx_fee(&client, &response.unwrap().tx_id.unwrap()).await;
 
-//     // check the balances of wallet_1 and wallet_2
-//     let balance_1: u64 = wallet_1.get_asset_balance(&AssetId::zeroed()).await.unwrap();
-//     let balance_2: u64 = wallet_2.get_asset_balance(&AssetId::zeroed()).await.unwrap();
-//     let balance_3: u64 = wallet_3.get_asset_balance(&AssetId::zeroed()).await.unwrap();
 
-//     assert!(balance_1 == 1007500000);
-//     assert!(balance_2 == 1142500000);
-//     assert!(balance_3 == 850000000);
-// }
-// // ANCHOR_END: rs_test_withdraw_funds
+    // check the balances of wallet_1 and wallet_2
+    let balance_1: u64 = wallet_1.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+    let balance_2: u64 = wallet_2.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+    let balance_3: u64 = wallet_3.get_asset_balance(&AssetId::zeroed()).await.unwrap();
+
+    assert!(balance_1 == wallet_1_starting_balance - total_wallet_1_fees + (item_1_price / 20)); // 5% commission
+    assert!(balance_2 == wallet_2_starting_balance - total_wallet_2_fees + item_1_price - ((item_1_price / 20))); // sell price - 5% commission
+    assert!(balance_3 == wallet_3_starting_balance - total_wallet_3_fees - item_1_price);
+}
+// ANCHOR_END: rs_test_withdraw_funds
